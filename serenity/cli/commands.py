@@ -582,15 +582,18 @@ def _check_licence(config: "Config") -> None:
         # Server unreachable — fall back to grace period.
         if check_grace_period(config.licence_last_validated):
             console.print(
-                "[yellow]  Licence server unreachable — running on grace period. "
-                f"Last validated: {config.licence_last_validated[:10]}[/yellow]"
+                "[yellow]  Cannot reach Lemon Squeezy — running on grace period.[/yellow]\n"
+                f"  [dim]Last validated: {config.licence_last_validated[:10]}. "
+                "Connect to the internet soon to re-verify your licence.[/dim]"
             )
             _authorise_nnn(key)   # grace period still unlocks NNN
             return
         console.print(
-            "\n[bold red]  Cannot reach the licence server and grace period has expired.[/bold red]\n"
+            "\n[bold red]  Licence verification failed — grace period expired.[/bold red]\n"
             f"  Last successful validation: {config.licence_last_validated[:10] or 'never'}\n"
-            "  Please connect to the internet and restart, or contact serenitydev32@gmail.com\n"
+            "\n  Serenity needs an internet connection to verify your licence.\n"
+            "  Please connect and restart. Your key and data are safe.\n"
+            "  Issues? Contact serenitydev32@gmail.com\n"
         )
         raise SystemExit(1)
 
