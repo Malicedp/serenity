@@ -304,7 +304,9 @@ Serenity is released under **CC BY-NC 4.0** — Creative Commons Attribution-Non
 
 **Requires a licence for:** any commercial application, deployment, or integration
 
-Full terms in [LICENSE](LICENSE) and [TERMS.md](TERMS.md). Support the project and keep it going: [seraficationkey.lemonsqueezy.com](https://seraficationkey.lemonsqueezy.com).
+Full terms in [LICENSE](LICENSE) and [TERMS.md](TERMS.md).
+
+> Keys are available at [seraficationkey.lemonsqueezy.com](https://seraficationkey.lemonsqueezy.com). Paid tiers exist purely to support the creator — Serenity is a personal project and the free tier covers everything most people will ever need.
 
 ---
 
