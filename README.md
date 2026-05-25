@@ -17,6 +17,7 @@
 [![CC BY-NC 4.0](https://img.shields.io/badge/Licence-CC%20BY--NC%204.0-22d3ee?style=flat-square)](LICENSE)
 [![Community](https://img.shields.io/badge/Fork%20it-Community%20First-4ade80?style=flat-square)](https://github.com/Malicedp/serenity/fork)
 [![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)]()
+[![Paper](https://img.shields.io/badge/Paper-Zenodo-blue?style=flat-square)](https://doi.org/10.5281/zenodo.20382162)
 [![Paper](https://img.shields.io/badge/Paper-Figshare-orange?style=flat-square)](https://doi.org/10.6084/m9.figshare.32399520)
 
 <br/>
