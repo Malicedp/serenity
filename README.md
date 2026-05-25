@@ -38,6 +38,9 @@ It reasons the same way whether the domain is technical, creative, analytical, p
 
 That's not a chatbot. That's an agent with a model of *you*.
 
+The architecture behind this is documented in the research paper:
+**[Serenity S.E.R.A — Semantic Experience Reasoning Agent](https://doi.org/10.5281/zenodo.20382162)**
+
 ---
 
 ## Cross-domain in practice
