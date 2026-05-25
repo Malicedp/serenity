@@ -59,7 +59,12 @@ def _version() -> str:
         from serenity import __version__
         return __version__
     except Exception:
-        return "0.1.5.post1"
+        pass
+    try:
+        from importlib.metadata import version
+        return version("serenity")
+    except Exception:
+        return "unknown"
 
 
 # ── ASCII LOGO ────────────────────────────────────────────────────────────────

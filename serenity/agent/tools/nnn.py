@@ -20,29 +20,36 @@ from __future__ import annotations
 
 import asyncio
 import os
+import threading
 from typing import Any
-
-# Per-call timeout for NNN embedding / query / rewrite operations.
-# nomic-embed-text on a cold Ollama instance can take 60-90 s on first load;
-# 120 s covers that comfortably. Override with SERENITY_NNN_TIMEOUT (seconds).
-_NNN_TIMEOUT = float(os.environ.get("SERENITY_NNN_TIMEOUT", "120"))
 
 from serenity.agent.tools.base import Tool, tool_parameters
 from serenity.agent.tools.schema import StringSchema, tool_parameters_schema
 
+# Per-call timeout for NNN embedding / query / rewrite operations.
+# nomic-embed-text on a cold Ollama instance can take 60-90 s on first load;
+# 120 s covers that comfortably. Override with SERENITY_NNN_TIMEOUT (seconds).
+# Read lazily so tests can set the env var after import.
+def _nnn_timeout() -> float:
+    return float(os.environ.get("SERENITY_NNN_TIMEOUT", "120"))
+
 # ── Module-level cache ────────────────────────────────────────────────────────
-_nnn_query_fn  = None
-_nnn_encode_fn = None
+_nnn_query_fn   = None
+_nnn_encode_fn  = None
 _nnn_rewrite_fn = None
+_nnn_init_lock  = threading.Lock()  # prevents double-import race under concurrent async tasks
 
 
 def _get_nnn_fns():
     global _nnn_query_fn, _nnn_encode_fn, _nnn_rewrite_fn
     if _nnn_query_fn is None:
-        from serenity_nnn import encode, query, rewrite
-        _nnn_query_fn  = query
-        _nnn_encode_fn = encode
-        _nnn_rewrite_fn = rewrite
+        with _nnn_init_lock:
+            # Double-check after acquiring lock — another thread may have initialised first
+            if _nnn_query_fn is None:
+                from serenity_nnn import encode, query, rewrite
+                _nnn_query_fn  = query
+                _nnn_encode_fn = encode
+                _nnn_rewrite_fn = rewrite
     return _nnn_query_fn, _nnn_encode_fn, _nnn_rewrite_fn
 
 
@@ -87,7 +94,7 @@ class NNNQueryTool(Tool):
             loop = asyncio.get_running_loop()
             results = await asyncio.wait_for(
                 loop.run_in_executor(None, lambda: nnn_query_fn(text=query, token_budget=3000)),
-                timeout=_NNN_TIMEOUT,
+                timeout=_nnn_timeout(),
             )
             if not results:
                 return (
@@ -125,7 +132,7 @@ class NNNQueryTool(Tool):
                 )
             return "Causal memory activated:\n\n" + "\n\n".join(parts)
         except asyncio.TimeoutError:
-            return f"NNN query timed out after {_NNN_TIMEOUT:.0f}s (Ollama may be cold). Set SERENITY_NNN_TIMEOUT to increase."
+            return f"NNN query timed out after {_nnn_timeout():.0f}s (Ollama may be cold). Set SERENITY_NNN_TIMEOUT to increase."
         except Exception as e:
             return f"NNN unavailable: {e}"
 
@@ -215,18 +222,20 @@ class NNNStoreTool(Tool):
         try:
             _, nnn_encode_fn, _ = _get_nnn_fns()
             loop = asyncio.get_running_loop()
+            timeout = _nnn_timeout()
             result = await asyncio.wait_for(
                 loop.run_in_executor(None, lambda: nnn_encode_fn(text=cleaned, session_id=session_id)),
-                timeout=_NNN_TIMEOUT,
+                timeout=timeout,
             )
-            bundle_short = result['bundle_id'][:8]
+            bundle_id = result.get("bundle_id") or "unknown"
+            bundle_short = bundle_id[:8]
             return (
                 f"Stored to NNN ✓\n"
-                f"Action: {result['action']} | Bundle: {bundle_short}...\n"
+                f"Action: {result.get('action', 'stored')} | Bundle: {bundle_short}...\n"
                 f"Vault note already written separately with the full story."
             )
         except asyncio.TimeoutError:
-            return f"NNN store timed out after {_NNN_TIMEOUT:.0f}s (Ollama may be cold). Set SERENITY_NNN_TIMEOUT to increase."
+            return f"NNN store timed out after {_nnn_timeout():.0f}s (Ollama may be cold). Set SERENITY_NNN_TIMEOUT to increase."
         except Exception as e:
             return f"Could not store to NNN: {e}"
 
@@ -293,7 +302,7 @@ class NNNSimulateTool(Tool):
                     None,
                     lambda: simulate_plan(action_list, initial_state),
                 ),
-                timeout=_NNN_TIMEOUT,
+                timeout=_nnn_timeout(),
             )
 
             if not steps:
@@ -325,7 +334,7 @@ class NNNSimulateTool(Tool):
             return "\n\n".join(lines)
 
         except asyncio.TimeoutError:
-            return f"nnn_simulate timed out after {_NNN_TIMEOUT:.0f}s."
+            return f"nnn_simulate timed out after {_nnn_timeout():.0f}s."
         except Exception as e:
             return f"nnn_simulate failed: {e}"
 
@@ -371,7 +380,7 @@ class NNNRewriteTool(Tool):
                         session_id=session_id,
                     ),
                 ),
-                timeout=_NNN_TIMEOUT,
+                timeout=_nnn_timeout(),
             )
             return (
                 f"NNN updated. "
@@ -379,6 +388,6 @@ class NNNRewriteTool(Tool):
                 f"new bundle {result['new_bundle_id'][:8]}..."
             )
         except asyncio.TimeoutError:
-            return f"NNN rewrite timed out after {_NNN_TIMEOUT:.0f}s (Ollama may be cold). Set SERENITY_NNN_TIMEOUT to increase."
+            return f"NNN rewrite timed out after {_nnn_timeout():.0f}s (Ollama may be cold). Set SERENITY_NNN_TIMEOUT to increase."
         except Exception as e:
             return f"Could not rewrite NNN bundle: {e}"

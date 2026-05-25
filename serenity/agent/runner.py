@@ -542,7 +542,7 @@ class AgentRunner:
                             fatal_error = None  # prevent error branch below
                             break
                     else:
-                        fatal_error = fatal_error  # no finish call — fall through normally
+                        pass  # no finish call — fall through normally
                     if final_content is not None and stop_reason == "completed":
                         break
                 # ─────────────────────────────────────────────────────────
@@ -593,7 +593,7 @@ class AgentRunner:
                 # This is a user-role message so it is valid for all providers.
                 #
                 _called_tool_names = {tc.name for tc in response.tool_calls}
-                if True:
+                if _called_tool_names:
                     _tool_names = ", ".join(tc.name for tc in response.tool_calls)
                     messages.append({
                         "role": "user",

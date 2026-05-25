@@ -165,7 +165,12 @@ class CronService:
                         continue
             self._store.jobs = list(jobs_map.values())
             if self._running and changed:
-                self._action_path.write_text("", encoding="utf-8")
+                # Clear action log atomically — write empty tmp then os.replace()
+                # so a crash between truncation and save doesn't lose pending actions.
+                import os as _os
+                _tmp = self._action_path.with_suffix(".tmp")
+                _tmp.write_text("", encoding="utf-8")
+                _os.replace(_tmp, self._action_path)
                 self._save_store()
         return
 
@@ -441,7 +446,7 @@ class CronService:
         now = _now_ms()
 
         job = CronJob(
-            id=str(uuid.uuid4())[:8],
+            id=str(uuid.uuid4()),
             name=name,
             enabled=True,
             schedule=schedule,

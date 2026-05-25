@@ -27,6 +27,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from filelock import FileLock
+from loguru import logger
+
 from serenity.agent.tools.base import Tool, tool_parameters
 from serenity.agent.tools.schema import StringSchema, tool_parameters_schema
 
@@ -47,20 +50,27 @@ def _goals_md_path(workspace: Path) -> Path:
     return p
 
 
+def _lock_path(workspace: Path) -> Path:
+    return _goals_path(workspace).with_suffix(".lock")
+
+
 def _load(workspace: Path) -> dict:
     p = _goals_path(workspace)
     if not p.exists():
         return {"active": [], "completed": []}
-    try:
-        return json.loads(p.read_text(encoding="utf-8"))
-    except Exception:
-        return {"active": [], "completed": []}
+    with FileLock(str(_lock_path(workspace)), timeout=5):
+        try:
+            return json.loads(p.read_text(encoding="utf-8"))
+        except Exception as exc:
+            logger.warning("goals.json could not be read ({}), returning empty goal set", exc)
+            return {"active": [], "completed": []}
 
 
 def _save(workspace: Path, data: dict) -> None:
-    _goals_path(workspace).write_text(
-        json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
-    )
+    with FileLock(str(_lock_path(workspace)), timeout=5):
+        _goals_path(workspace).write_text(
+            json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
     _render_md(workspace, data)
 
 

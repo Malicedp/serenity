@@ -228,7 +228,8 @@ class Tool(ABC):
             return [f"parameters must be an object, got {type(params).__name__}"]
         schema = self.parameters or {}
         if schema.get("type", "object") != "object":
-            raise ValueError(f"Schema must be object type, got {schema.get('type')!r}")
+            # Return an error list rather than raising — callers expect a list, not an exception
+            return [f"Schema must be object type, got {schema.get('type')!r}"]
         return Schema.validate_json_schema_value(params, {**schema, "type": "object"}, "")
 
     def to_schema(self) -> dict[str, Any]:

@@ -1,5 +1,5 @@
 @echo off
-setlocal enableextensions
+setlocal enableextensions enabledelayedexpansion
 title Serenity Gateway
 chcp 65001 >nul
 set PYTHONIOENCODING=utf-8
@@ -43,18 +43,34 @@ taskkill /F /IM sera.exe >nul 2>&1
 taskkill /F /IM python.exe /FI "WINDOWTITLE eq Serenity Gateway" >nul 2>&1
 timeout /t 2 /nobreak >nul
 
-:: --- Install / update all dependencies ---
-echo  Installing dependencies...
-python -m pip install -e ".[senses,spotify,obs]" -q --no-warn-script-location
-if %errorlevel% neq 0 (
-    echo  pip install failed - attempting repair...
-    python -m pip install -e ".[senses,spotify,obs]" --force-reinstall -q --no-warn-script-location
-    if %errorlevel% neq 0 (
-        echo  [ERROR] Repair failed. Check your Python install.
-        goto :fail
-    )
+:: --- Install / update dependencies (only when pyproject.toml changed) ---
+set MARKER=%~dp0.deps_installed
+set PYPROJECT=%~dp0pyproject.toml
+set NEEDS_INSTALL=0
+
+if not exist "%MARKER%" set NEEDS_INSTALL=1
+if exist "%MARKER%" (
+    for %%A in ("%PYPROJECT%") do set PYPROJECT_TIME=%%~tA
+    for %%B in ("%MARKER%") do set MARKER_TIME=%%~tB
+    if "!PYPROJECT_TIME!" gtr "!MARKER_TIME!" set NEEDS_INSTALL=1
 )
-echo  Dependencies OK.
+
+if "%NEEDS_INSTALL%"=="1" (
+    echo  Installing dependencies...
+    python -m pip install -e ".[senses,spotify,obs]" -q --no-warn-script-location
+    if %errorlevel% neq 0 (
+        echo  pip install failed - attempting repair...
+        python -m pip install -e ".[senses,spotify,obs]" --force-reinstall -q --no-warn-script-location
+        if %errorlevel% neq 0 (
+            echo  [ERROR] Repair failed. Check your Python install.
+            goto :fail
+        )
+    )
+    type nul > "%MARKER%"
+    echo  Dependencies OK.
+) else (
+    echo  Dependencies up to date.
+)
 echo.
 
 :: --- GitNexus (optional - requires Node.js) ---

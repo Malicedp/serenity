@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import re
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -167,7 +167,8 @@ def _append_to_decisions_index(workspace: Path, goal: str, task_id: str, decisio
 
 def _extract_frontmatter_field(content: str, field: str) -> str:
     """Extract a field value from YAML frontmatter."""
-    m = re.search(rf"^{field}:\s*(.+)$", content, re.MULTILINE)
+    # re.escape(field) prevents regex metacharacters in field names from breaking the pattern
+    m = re.search(rf"^{re.escape(field)}:\s*(.+)$", content, re.MULTILINE)
     return m.group(1).strip() if m else ""
 
 
@@ -219,7 +220,7 @@ class TaskStartTool(Tool):
         filename = f"task-{task_id}.md"
 
         hours = max(1, int(due_hours or 48))
-        due_dt = datetime.now() + timedelta(hours=hours)
+        due_dt = datetime.now(timezone.utc) + timedelta(hours=hours)
         due_str = due_dt.isoformat(timespec="seconds")
 
         step_lines = [s.strip() for s in steps.strip().splitlines() if s.strip()]
@@ -243,6 +244,17 @@ class TaskStartTool(Tool):
 
         path = _tasks_dir(self._workspace) / filename
         path.write_text(content, encoding="utf-8")
+
+        # Warn if an active task is being overwritten — the old task pointer is lost.
+        existing = _get_active_path(self._workspace)
+        if existing and existing.exists():
+            from loguru import logger as _log
+            _log.warning(
+                "task_start: overwriting active task pointer (was: {}) — "
+                "call task_complete or task_cancel first to avoid orphaned tasks.",
+                existing.name,
+            )
+
         _set_active(self._workspace, filename)
 
         return (

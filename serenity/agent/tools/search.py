@@ -434,7 +434,11 @@ class GrepTool(_SearchTool):
                 if not _matches_type(file_path.name, type):
                     continue
 
-                raw = file_path.read_bytes()
+                try:
+                    raw = file_path.read_bytes()
+                except (PermissionError, OSError):
+                    skipped_binary += 1  # treat unreadable files like binary — skip silently
+                    continue
                 if len(raw) > self._MAX_FILE_BYTES:
                     skipped_large += 1
                     continue

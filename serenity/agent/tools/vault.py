@@ -94,9 +94,12 @@ class VaultWriteTool(Tool):
         slug = _slugify(title)
         filename = f"{slug}.md"
 
-        # Resolve destination folder, creating it if needed
+        # Resolve destination folder, creating it if needed.
+        # Guard against path traversal (e.g. subfolder="../../etc").
         if subfolder and subfolder.strip():
-            dest_dir = self._workspace / subfolder.strip()
+            dest_dir = (self._workspace / subfolder.strip()).resolve()
+            if not str(dest_dir).startswith(str(self._workspace.resolve())):
+                return f"Error: subfolder '{subfolder}' escapes the vault workspace — operation rejected."
         else:
             dest_dir = self._workspace
 

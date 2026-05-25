@@ -42,20 +42,42 @@ if [ "$PY_OK" != "1" ]; then
 fi
 
 # ── Kill any existing gateway process ─────────────────────────────────────
-pkill -f "sera gateway" 2>/dev/null || true
-sleep 1
-
-# ── Install / update all dependencies ─────────────────────────────────────
-echo " Installing dependencies..."
-if ! $PYTHON -m pip install -e ".[senses,spotify,obs]" -q --no-warn-script-location; then
-    echo " pip install failed — attempting repair..."
-    if ! $PYTHON -m pip install -e ".[senses,spotify,obs]" --force-reinstall -q --no-warn-script-location; then
-        echo " [ERROR] Repair failed. Check your Python install."
-        exit 1
+# Use a PID file to kill by PID rather than pkill -f (which can hit other users' processes)
+_PID_FILE="$SCRIPT_DIR/.serenity_gateway.pid"
+if [ -f "$_PID_FILE" ]; then
+    _OLD_PID=$(cat "$_PID_FILE" 2>/dev/null)
+    if [ -n "$_OLD_PID" ] && kill -0 "$_OLD_PID" 2>/dev/null; then
+        kill "$_OLD_PID" 2>/dev/null || true
+        sleep 1
     fi
+    rm -f "$_PID_FILE"
 fi
 
-echo " Dependencies OK."
+# ── Install / update dependencies (only when pyproject.toml changed) ──────
+_MARKER="$SCRIPT_DIR/.deps_installed"
+_PYPROJECT="$SCRIPT_DIR/pyproject.toml"
+_NEEDS_INSTALL=false
+
+if [ ! -f "$_MARKER" ]; then
+    _NEEDS_INSTALL=true
+elif [ "$_PYPROJECT" -nt "$_MARKER" ]; then
+    _NEEDS_INSTALL=true
+fi
+
+if [ "$_NEEDS_INSTALL" = true ]; then
+    echo " Installing dependencies..."
+    if ! $PYTHON -m pip install -e ".[senses,spotify,obs]" -q --no-warn-script-location; then
+        echo " pip install failed — attempting repair..."
+        if ! $PYTHON -m pip install -e ".[senses,spotify,obs]" --force-reinstall -q --no-warn-script-location; then
+            echo " [ERROR] Repair failed. Check your Python install."
+            exit 1
+        fi
+    fi
+    touch "$_MARKER"
+    echo " Dependencies OK."
+else
+    echo " Dependencies up to date (pyproject.toml unchanged)."
+fi
 echo ""
 
 # ── Install GitNexus if npm is available ──────────────────────────────────
@@ -88,8 +110,14 @@ CONFIG_FILE="$HOME/.serenity/config.json"
 if [ ! -f "$CONFIG_FILE" ]; then
     echo " No config found - launching setup wizard..."
     echo ""
-    exec serenity
+    # Do NOT use 'exec serenity' — exec replaces the shell process so the
+    # terminal closes when the wizard exits instead of returning to this script.
+    serenity
 fi
 
 # ── Launch the gateway ─────────────────────────────────────────────────────
-sera gateway
+# Store PID so the next launch can kill this instance cleanly
+sera gateway &
+_GW_PID=$!
+echo $_GW_PID > "$_PID_FILE"
+wait $_GW_PID

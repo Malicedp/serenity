@@ -654,7 +654,9 @@ class TelegramChannel(BaseChannel):
         import tempfile
 
         ext = self._tts_provider.output_extension
-        tmp_path = Path(tempfile.mktemp(suffix=ext))
+        # Use NamedTemporaryFile instead of deprecated mktemp() — no TOCTOU race
+        with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as _tf:
+            tmp_path = Path(_tf.name)
         try:
             ok = await self._tts_provider.synthesize(text, tmp_path)
             if not ok or not tmp_path.exists():
@@ -886,10 +888,16 @@ class TelegramChannel(BaseChannel):
         chat_id = str(update.message.chat_id)
         sender_id = self._sender_id(user)
 
+        # Sanitise display name before injecting into the system prompt.
+        # Telegram display names are untrusted user input — strip brackets and
+        # control characters to prevent prompt injection attacks.
+        _safe_name = re.sub(r"[\[\]<>{}\n\r]", "", user.first_name or "").strip()[:64] or "unknown"
+        _safe_uname = re.sub(r"[\[\]<>{}\n\r@]", "", user.username or "").strip()[:32]
+
         # Build a system-injected onboarding prompt that the agent handles naturally
         onboarding_prompt = (
-            f"[SYSTEM: New user just started the bot. Telegram name: {user.first_name}"
-            + (f" (@{user.username})" if user.username else "")
+            f"[SYSTEM: New user just started the bot. Telegram name: {_safe_name}"
+            + (f" (@{_safe_uname})" if _safe_uname else "")
             + f", Telegram ID: {user.id}]\n\n"
             "Greet the user warmly. Tell them your name. Ask what they'd like to be called. "
             "Then ask two or three light questions to get to know them — for example what they're "

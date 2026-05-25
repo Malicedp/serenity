@@ -5,7 +5,7 @@ from __future__ import annotations
 import ipaddress
 import re
 import socket
-from urllib.parse import urlparse
+from urllib.parse import urlparse, unquote
 
 _BLOCKED_NETWORKS = [
     ipaddress.ip_network("0.0.0.0/8"),
@@ -18,9 +18,13 @@ _BLOCKED_NETWORKS = [
     ipaddress.ip_network("::1/128"),
     ipaddress.ip_network("fc00::/7"),          # unique local
     ipaddress.ip_network("fe80::/10"),         # link-local v6
+    ipaddress.ip_network("::ffff:0:0/96"),     # IPv4-mapped IPv6 (covers ::ffff:127.x.x.x etc.)
 ]
 
 _URL_RE = re.compile(r"https?://[^\s\"'`;|<>]+", re.IGNORECASE)
+
+# DNS lookup timeout in seconds — bounds the blocking time during SSRF checks
+_DNS_TIMEOUT = 3.0
 
 _allowed_networks: list[ipaddress.IPv4Network | ipaddress.IPv6Network] = []
 
@@ -43,13 +47,28 @@ def _is_private(addr: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
     return any(addr in net for net in _BLOCKED_NETWORKS)
 
 
+def _dns_lookup(hostname: str) -> list:
+    """Perform a DNS lookup with a short timeout to bound blocking time."""
+    old_timeout = socket.getdefaulttimeout()
+    try:
+        socket.setdefaulttimeout(_DNS_TIMEOUT)
+        return socket.getaddrinfo(hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM)
+    finally:
+        socket.setdefaulttimeout(old_timeout)
+
+
 def validate_url_target(url: str) -> tuple[bool, str]:
     """Validate a URL is safe to fetch: scheme, hostname, and resolved IPs.
 
+    Decodes percent-encoded characters before checking so that
+    http://127%2E0%2E0%2E1/ does not bypass the private-IP block.
+
     Returns (ok, error_message).  When ok is True, error_message is empty.
     """
+    # Decode percent-encoding before any checks
+    decoded_url = unquote(url)
     try:
-        p = urlparse(url)
+        p = urlparse(decoded_url)
     except Exception as e:
         return False, str(e)
 
@@ -63,13 +82,16 @@ def validate_url_target(url: str) -> tuple[bool, str]:
         return False, "Missing hostname"
 
     try:
-        infos = socket.getaddrinfo(hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM)
+        infos = _dns_lookup(hostname)
     except socket.gaierror:
+        # DNS failure — treat as blocked (fail-safe) rather than allowing through
         return False, f"Cannot resolve hostname: {hostname}"
 
     for info in infos:
         try:
-            addr = ipaddress.ip_address(info[4][0])
+            raw_addr = ipaddress.ip_address(info[4][0])
+            # Unwrap IPv4-mapped IPv6 (::ffff:127.0.0.1 → 127.0.0.1) for clean matching
+            addr = raw_addr.ipv4_mapped or raw_addr
         except ValueError:
             continue
         if _is_private(addr):
@@ -80,8 +102,9 @@ def validate_url_target(url: str) -> tuple[bool, str]:
 
 def validate_resolved_url(url: str) -> tuple[bool, str]:
     """Validate an already-fetched URL (e.g. after redirect). Only checks the IP, skips DNS."""
+    decoded_url = unquote(url)
     try:
-        p = urlparse(url)
+        p = urlparse(decoded_url)
     except Exception:
         return True, ""
 
@@ -90,18 +113,21 @@ def validate_resolved_url(url: str) -> tuple[bool, str]:
         return True, ""
 
     try:
-        addr = ipaddress.ip_address(hostname)
+        raw_addr = ipaddress.ip_address(hostname)
+        addr = raw_addr.ipv4_mapped or raw_addr
         if _is_private(addr):
             return False, f"Redirect target is a private address: {addr}"
     except ValueError:
         # hostname is a domain name, resolve it
         try:
-            infos = socket.getaddrinfo(hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM)
+            infos = _dns_lookup(hostname)
         except socket.gaierror:
-            return True, ""
+            # DNS failure on redirect — treat as blocked (fail-safe)
+            return False, f"Cannot resolve redirect hostname: {hostname}"
         for info in infos:
             try:
-                addr = ipaddress.ip_address(info[4][0])
+                raw_addr = ipaddress.ip_address(info[4][0])
+                addr = raw_addr.ipv4_mapped or raw_addr
             except ValueError:
                 continue
             if _is_private(addr):

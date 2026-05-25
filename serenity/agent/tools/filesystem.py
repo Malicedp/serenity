@@ -532,11 +532,15 @@ def _find_quote_matches(content: str, old_text: str) -> list[_MatchSpan]:
         idx = norm_content.find(norm_old, start)
         if idx == -1:
             break
+        # Use len(norm_old) — not len(old_text) — for the replacement span.
+        # Quote normalisation can change string length; using the un-normalised
+        # length would produce an off-by-(len(norm_old) - len(old_text)) garbled edit.
+        end = idx + len(norm_old)
         matches.append(
             _MatchSpan(
                 start=idx,
-                end=idx + len(old_text),
-                text=content[idx : idx + len(old_text)],
+                end=end,
+                text=content[idx:end],
                 line=content.count("\n", 0, idx) + 1,
             )
         )
@@ -632,7 +636,7 @@ def _find_match(content: str, old_text: str) -> tuple[str | None, int]:
 class EditFileTool(_FsTool):
     """Edit a file by replacing text with fallback matching."""
 
-    _MAX_EDIT_FILE_SIZE = 1024 * 1024 * 1024  # 1 GiB
+    _MAX_EDIT_FILE_SIZE = 50 * 1024 * 1024  # 50 MiB — reading a 1 GiB file into memory would OOM most machines
     _MARKDOWN_EXTS = frozenset({".md", ".mdx", ".markdown"})
 
     @property
@@ -913,7 +917,7 @@ class MakeDirTool(_FsTool):
 
     async def execute(self, path: str, **kwargs: Any) -> str:
         try:
-            p = Path(path).expanduser().resolve()
+            p = self._resolve(path)
             p.mkdir(parents=True, exist_ok=True)
             return f"Created: {p}"
         except PermissionError as e:

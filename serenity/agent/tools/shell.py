@@ -152,10 +152,17 @@ class ExecTool(Tool):
         env = self._build_env()
 
         if self.path_append:
+            # Validate path_append — must be simple path segments only.
+            # Shell metacharacters (quotes, semicolons, pipes, etc.) are rejected
+            # to prevent command injection via a malicious path_append value.
+            _safe_path = re.sub(r"[^A-Za-z0-9_./ :\-]", "", self.path_append)
+            if _safe_path != self.path_append:
+                return "Error: path_append contains disallowed characters (only alphanumeric, _, ., /, :, - allowed)"
             if _IS_WINDOWS:
-                env["PATH"] = env.get("PATH", "") + ";" + self.path_append
+                env["PATH"] = env.get("PATH", "") + ";" + _safe_path
             else:
-                command = f'export PATH="$PATH:{self.path_append}"; {command}'
+                # Inject via env dict rather than string interpolation — no shell quoting risk
+                env["PATH"] = env.get("PATH", "") + ":" + _safe_path
 
         try:
             process = await self._spawn(command, cwd, env)
