@@ -100,6 +100,31 @@ These aren't cherry-picked examples — they're the natural result of a memory s
 | 🔌 | **MCP server** | Serenity's memory becomes available inside Claude Code via the MCP protocol |
 | 🗺️ | **Memory atlas** | Visual map of every memory bundle — run `sera visualise` |
 | 🎭 | **Emotional dynamics** | Adapts tone and energy to the conversation naturally over time |
+| 🗣️ | **Code-switching** | Detects and mirrors your dialect — AAVE, UK slang, Gen-Z, casual, tech — naturally, not performed |
+| 🤝 | **Claude integration** | Claude Code plugs into Serenity via MCP — shared memory, shared context, two agents working as one |
+
+---
+
+## Code-switching and dialect adaptation
+
+Serenity doesn't talk at you in one fixed register. She reads how you communicate and eases into it naturally.
+
+Every turn, a `SpeechPatternDetector` scores your last 10 messages against a set of dialect and tone signatures. Once a pattern clears the threshold — you've been writing in a certain register consistently — she shifts into it. Not every sentence. Not forced. It just starts feeling right.
+
+**Registers she detects and mirrors:**
+
+| Register | What triggers it | Example vocabulary |
+|---|---|---|
+| **AAVE / ATL** | Black American vernacular patterns | finna, bet, no cap, on God, ion, icl, deadass, say less, fasho |
+| **UK road** | British / roadman patterns | wagwan, peng, bare, mandem, peak, safe, innit, wallahi, suttin |
+| **Gen-Z** | Internet-native patterns | it's giving, no cap, slay, bussin, delulu, rent free, ate |
+| **Casual** | Contractions, short sentences | yeah, ngl, tbh, lowkey, fr, gonna, kinda, bruh |
+| **Tech** | Developer culture | ship it, refactor, yak shaving, MVP, scope creep |
+| **Formal** | Structured, precise input | Complete sentences, precise vocabulary, no filler |
+
+The shift is gradual — it follows inertia rules so she doesn't flip registers mid-conversation. And if you set a tone explicitly in the setup wizard, that always wins over auto-detection.
+
+This extends to greeting energy too. High-energy opener → she matches it. Tired one-liner → she keeps it tight. Closure signals → she stops asking questions and lets the conversation end naturally.
 
 ---
 
@@ -268,6 +293,45 @@ register_tool(MyTool)
 ```
 
 Skills can define tools, cron jobs, new channel behaviours, or anything else. The full tool registry is open — browse `serenity/agent/tools/` for examples.
+
+---
+
+## Claude + Serenity — two agents, one context
+
+Serenity ships a built-in MCP server (`serenity_mcp.py`). Connect it to Claude Code and the two agents share the same memory, the same workspace context, and the same understanding of you.
+
+This isn't just "Claude can read Serenity's notes." It's a genuine dual-agent setup — Serenity handles long-running tasks, channels, voice, scheduling, and personal memory; Claude Code handles deep code work, architecture decisions, and file-level precision. Both drawing from the same pool of context.
+
+### What Claude gets when connected
+
+| Tool | What it does |
+|---|---|
+| `serenity_recall` | Semantic search across Serenity's full memory — everything she's ever learned about you, your projects, your preferences |
+| `serenity_remember` | Write to shared memory — anything Claude figures out gets stored and is available to Serenity on her next run |
+| `serenity_status` | Check NNN connection, bundle count, authorisation state |
+
+### How to connect
+
+Add to `~/.claude/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "serenity": {
+      "command": "python",
+      "args": ["path/to/serenity_mcp.py"]
+    }
+  }
+}
+```
+
+Restart Claude Code. The three memory tools appear automatically in every session.
+
+### What this looks like in practice
+
+You've been working with Serenity for months. She knows your codebase, your preferences, your current projects, the decisions you've made and why. You open Claude Code for a deep refactor session. Claude recalls your project history from Serenity's memory before touching a single file — your stack, your patterns, what you've tried before, what you care about. When Claude finishes, it writes what it found back to memory. Serenity knows about it the next time she runs.
+
+Neither agent is subordinate to the other. They're two interfaces on the same model of you.
 
 ---
 
