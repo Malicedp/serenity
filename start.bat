@@ -50,9 +50,8 @@ set NEEDS_INSTALL=0
 
 if not exist "%MARKER%" set NEEDS_INSTALL=1
 if exist "%MARKER%" (
-    for %%A in ("%PYPROJECT%") do set PYPROJECT_TIME=%%~tA
-    for %%B in ("%MARKER%") do set MARKER_TIME=%%~tB
-    if "!PYPROJECT_TIME!" gtr "!MARKER_TIME!" set NEEDS_INSTALL=1
+    python -c "import os,sys; p=r'%PYPROJECT%'; m=r'%MARKER%'; sys.exit(0 if os.path.exists(m) and os.path.getmtime(p)<=os.path.getmtime(m) else 1)" 2>nul
+    if !errorlevel! neq 0 set NEEDS_INSTALL=1
 )
 
 if "%NEEDS_INSTALL%"=="1" (

@@ -4,6 +4,7 @@ NNN shim — loaded when the compiled nnn.cp311-win_amd64.pyd is unavailable.
 
 All public functions raise RuntimeError with a clear platform message so
 callers can catch the error and degrade gracefully rather than crashing.
+On Windows Python 3.11, the .pyd takes precedence over this file automatically.
 """
 
 from __future__ import annotations
@@ -30,6 +31,26 @@ def encode(text: str, session_id: str = "") -> dict:  # noqa: ARG001
 
 def query(text: str, token_budget: int = 1000) -> list:  # noqa: ARG001
     """Query NNN for semantically similar memories."""
+    raise RuntimeError(_PLATFORM_MSG)
+
+
+def rewrite(bundle_id: str, new_content: str) -> dict:  # noqa: ARG001
+    """Rewrite an existing NNN bundle."""
+    raise RuntimeError(_PLATFORM_MSG)
+
+
+def consolidate() -> None:
+    """Consolidate NNN bundles (background maintenance)."""
+    raise RuntimeError(_PLATFORM_MSG)
+
+
+def prune() -> None:
+    """Prune low-activation NNN bundles (background maintenance)."""
+    raise RuntimeError(_PLATFORM_MSG)
+
+
+def simulate_plan(actions: list, initial_state: str) -> list:  # noqa: ARG001
+    """Simulate a multi-step plan using NNN causal memory."""
     raise RuntimeError(_PLATFORM_MSG)
 
 

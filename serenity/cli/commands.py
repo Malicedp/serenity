@@ -556,14 +556,27 @@ def _check_licence(config: "Config") -> None:
     key = config.licence_key
 
     if not key:
-        # No key — this should not happen after the wizard enforces one,
-        # but guard anyway (e.g. manually edited config.json).
+        # No key — can happen on first run if the setup wizard didn't collect one.
+        # Prompt interactively rather than hard-exiting so users aren't left stuck.
         console.print(
-            "\n[bold red]  Serenity requires a licence key to start.[/bold red]\n"
-            "  Get a free personal key at [bold]https://seraficationkey.lemonsqueezy.com/checkout/buy/9967e436-54fe-4ab3-b7f0-8ce71a348d4e[/bold]\n"
-            "  Then run [bold]sera onboard[/bold] and enter it under [L] Licence Key.\n"
+            "\n[bold yellow]  No licence key found.[/bold yellow]\n"
+            "  Get your free personal key instantly at:\n"
+            "  [bold cyan]https://seraficationkey.lemonsqueezy.com/checkout/buy/9967e436-54fe-4ab3-b7f0-8ce71a348d4e[/bold cyan]\n"
+            "  Your key arrives by email within seconds.\n"
         )
-        raise SystemExit(1)
+        try:
+            import re as _re
+            raw = console.input("  [bold]Paste your key here:[/bold] ").strip().upper()
+            if not _re.match(
+                r'^[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}$', raw
+            ):
+                console.print("[red]  That doesn't look like a valid key (expected UUID format). Run [bold]sera onboard[/bold] to try again.[/red]")
+                raise SystemExit(1)
+            key = raw
+            config.licence_key = key
+        except (KeyboardInterrupt, EOFError):
+            console.print("\n[dim]  Startup cancelled.[/dim]")
+            raise SystemExit(0)
 
     # Key present — validate with Lemon Squeezy (activates if no instance_id yet).
     instance_id = getattr(config, "licence_instance_id", "")
@@ -1293,7 +1306,7 @@ def gateway(
                 await asyncio.to_thread(nnn.consolidate)
                 await asyncio.to_thread(nnn.prune)
             except Exception:
-                logger.debug("NNN scheduler tick failed: {}", exc_info=True)
+                logger.debug("NNN scheduler tick failed", exc_info=True)
 
     async def run():
         try:
@@ -1378,6 +1391,14 @@ def agent(
 
     config = _load_runtime_config(config, workspace)
     sync_workspace_templates(config.workspace_path)
+
+    # Licence check — same as gateway so NNN is authorised for agent sessions too
+    _check_licence(config)
+    try:
+        from serenity.config.loader import get_config_path, save_config
+        save_config(config, get_config_path())
+    except Exception:
+        pass
 
     bus = MessageBus()
     provider = _make_provider(config)

@@ -51,17 +51,17 @@ def is_master_key_active() -> bool:
 def check_grace_period(
     last_validated_iso: str,
     grace_days: int = 7,
-) -> dict:
+) -> bool:
     """Check whether the offline grace period is still valid.
 
-    On unsupported platforms, returns an expired grace period so the
-    licence flow prompts the user to reconnect rather than silently
-    allowing unlimited offline use.
+    Returns True if the grace period is still active, False if expired.
+
+    The caller uses this as a bool: `if check_grace_period(...):` — so the
+    shim returns False (expired) to force an offline-block on unsupported
+    platforms rather than silently allowing unlimited offline use.
+
+    On Windows Python 3.11 the compiled .pyd overrides this file entirely.
     """
     if not _IS_WIN311:
-        return {
-            "valid": False,
-            "reason": "Licence module not available on this platform.",
-            "platform_unsupported": True,
-        }
+        return False
     raise ImportError(_UNSUPPORTED_MSG)

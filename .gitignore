@@ -100,6 +100,10 @@ nano.*.save
 .env.*
 !.env.example
 
+# Serenity runtime state — local only
+.deps_installed
+.serenity_gateway.pid
+
 # Logs & temp
 *.log
 logs/
