@@ -165,7 +165,7 @@ class ChannelManager:
             async with self._tts_lock:
                 ok = await self._tts_provider.synthesize(clean, tmp)
                 if ok and tmp.exists():
-                    await asyncio.get_event_loop().run_in_executor(
+                    await asyncio.get_running_loop().run_in_executor(
                         None, _play_audio_file, tmp
                     )
         except Exception as e:

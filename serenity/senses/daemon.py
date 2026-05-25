@@ -39,7 +39,7 @@ if TYPE_CHECKING:
 
 # ── Singleton state ───────────────────────────────────────────────────────────
 _wake_thread: threading.Thread | None = None
-_stop_event = threading.Event()
+_stop_event: threading.Event = threading.Event()
 _running = False
 
 
@@ -69,7 +69,9 @@ def start(bus: "MessageBus", event_loop: asyncio.AbstractEventLoop) -> None:
         logger.warning("SensesDaemon: could not load config — {}", e)
         return
 
-    _stop_event.clear()
+    # Create a fresh Event each time — re-using the old one after stop()+start()
+    # risks two threads sharing the same event and racing on .clear()/.set().
+    _stop_event = threading.Event()
     _running = True
 
     if cfg.senses.audio.enabled:

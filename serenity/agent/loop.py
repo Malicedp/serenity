@@ -104,6 +104,9 @@ from serenity.utils.helpers import image_placeholder_text
 from serenity.utils.helpers import truncate_text as truncate_text_fn
 
 
+from serenity.utils.runtime import EMPTY_FINAL_RESPONSE_MESSAGE
+
+
 def _log_voice(sender: str, preview: str) -> None:
     """Log a voice/mic input line in pink so it stands out in the terminal."""
     _s = sender.replace("<", r"\<").replace(">", r"\>")
@@ -111,7 +114,6 @@ def _log_voice(sender: str, preview: str) -> None:
     logger.opt(colors=True).info(
         f"<fg #FF69B4><bold>🎤  MIC  ▶  {_s}</bold>  {_p}</fg #FF69B4>"
     )
-from serenity.utils.runtime import EMPTY_FINAL_RESPONSE_MESSAGE
 
 if TYPE_CHECKING:
     from serenity.config.schema import ChannelsConfig, ExecToolConfig, ToolsConfig, WebToolsConfig
@@ -1065,7 +1067,15 @@ class AgentLoop:
         """Schedule a coroutine as a tracked background task (drained on shutdown)."""
         task = asyncio.create_task(coro)
         self._background_tasks.append(task)
-        task.add_done_callback(self._background_tasks.remove)
+
+        def _remove_task(t: asyncio.Task) -> None:
+            # Guard against double-remove during shutdown (close_mcp clears the list)
+            try:
+                self._background_tasks.remove(t)
+            except ValueError:
+                pass
+
+        task.add_done_callback(_remove_task)
 
     async def _run_chunk_notes(self, session) -> None:
         """Async wrapper for the synchronous generate_chunk_notes_if_needed."""

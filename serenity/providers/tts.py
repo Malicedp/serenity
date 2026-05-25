@@ -232,7 +232,7 @@ class Qwen3LocalTTSProvider:
                 logger.error("Qwen3 Local TTS failed: {}", e)
                 return False
 
-        return await asyncio.get_event_loop().run_in_executor(None, _run)
+        return await asyncio.get_running_loop().run_in_executor(None, _run)
 
 
 # ── Kokoro TTS ────────────────────────────────────────────────────────────────
@@ -330,7 +330,7 @@ class KokoroTTSProvider:
                 logger.error("Kokoro TTS failed: {}", e)
                 return False
 
-        return await asyncio.get_event_loop().run_in_executor(None, _run)
+        return await asyncio.get_running_loop().run_in_executor(None, _run)
 
 
 # ── Coqui XTTS-v2 ─────────────────────────────────────────────────────────────
@@ -426,7 +426,7 @@ class CoquiTTSProvider:
                 logger.error("Coqui XTTS-v2 failed: {}", e)
                 return False
 
-        return await asyncio.get_event_loop().run_in_executor(None, _run)
+        return await asyncio.get_running_loop().run_in_executor(None, _run)
 
 
 # ── Piper TTS ─────────────────────────────────────────────────────────────────
@@ -509,7 +509,7 @@ class PiperTTSProvider:
                 logger.error("Piper TTS failed: {}", e)
                 return False
 
-        return await asyncio.get_event_loop().run_in_executor(None, _run)
+        return await asyncio.get_running_loop().run_in_executor(None, _run)
 
 
 # ── Bark TTS ──────────────────────────────────────────────────────────────────
@@ -580,7 +580,7 @@ class BarkTTSProvider:
                 logger.error("Bark TTS failed: {}", e)
                 return False
 
-        return await asyncio.get_event_loop().run_in_executor(None, _run)
+        return await asyncio.get_running_loop().run_in_executor(None, _run)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -904,7 +904,7 @@ class GoogleTTSProvider:
                 logger.error("Google TTS failed: {}", e)
                 return False
 
-        return await asyncio.get_event_loop().run_in_executor(None, _run)
+        return await asyncio.get_running_loop().run_in_executor(None, _run)
 
 
 # ── Amazon Polly ──────────────────────────────────────────────────────────────
@@ -983,7 +983,7 @@ class AmazonPollyProvider:
                 logger.error("Amazon Polly failed: {}", e)
                 return False
 
-        return await asyncio.get_event_loop().run_in_executor(None, _run)
+        return await asyncio.get_running_loop().run_in_executor(None, _run)
 
 
 # ── Cartesia TTS ──────────────────────────────────────────────────────────────
@@ -1051,7 +1051,7 @@ class CartesiaTTSProvider:
                 logger.error("Cartesia voice clone failed: {}", e)
                 return None
 
-        vid = await asyncio.get_event_loop().run_in_executor(None, _upload)
+        vid = await asyncio.get_running_loop().run_in_executor(None, _upload)
         if vid:
             self._clone_cache[fhash] = vid
         return vid
@@ -1093,7 +1093,7 @@ class CartesiaTTSProvider:
                 logger.error("Cartesia TTS failed: {}", e)
                 return False
 
-        return await asyncio.get_event_loop().run_in_executor(None, _run)
+        return await asyncio.get_running_loop().run_in_executor(None, _run)
 
 
 # ── PlayHT TTS ────────────────────────────────────────────────────────────────
@@ -1156,7 +1156,7 @@ class PlayHTTTSProvider:
                 logger.error("PlayHT voice clone failed: {}", e)
                 return None
 
-        vid = await asyncio.get_event_loop().run_in_executor(None, _upload)
+        vid = await asyncio.get_running_loop().run_in_executor(None, _upload)
         if vid:
             self._clone_cache[fhash] = vid
         return vid
@@ -1199,7 +1199,7 @@ class PlayHTTTSProvider:
                 logger.error("PlayHT TTS failed: {}", e)
                 return False
 
-        return await asyncio.get_event_loop().run_in_executor(None, _run)
+        return await asyncio.get_running_loop().run_in_executor(None, _run)
 
 
 # ── Deepgram TTS ─────────────────────────────────────────────────────────────
@@ -1263,7 +1263,7 @@ class DeepgramTTSProvider:
                 logger.error("Deepgram TTS failed: {}", e)
                 return False
 
-        return await asyncio.get_event_loop().run_in_executor(None, _run)
+        return await asyncio.get_running_loop().run_in_executor(None, _run)
 
 
 # ── DashScope Qwen3 TTS (cloud) ───────────────────────────────────────────────
@@ -1379,7 +1379,7 @@ class DashScopeTTSProvider:
                 logger.error("PCM → OGG conversion failed: {}", e)
                 return False
 
-        ok = await asyncio.get_event_loop().run_in_executor(None, _convert)
+        ok = await asyncio.get_running_loop().run_in_executor(None, _convert)
         if ok:
             logger.info("DashScope TTS: wrote {} ({} bytes)",
                 output_path.name, output_path.stat().st_size)

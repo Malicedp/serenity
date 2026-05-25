@@ -885,7 +885,7 @@ class ContextBuilder:
             parts.append(nnn_block)
         return "\n\n".join(parts)
 
-    async def vault_triggered_nnn_async(self, message: str, timeout: float = float(os.environ.get("SERENITY_NNN_QUERY_TIMEOUT", "1.0"))) -> str:
+    async def vault_triggered_nnn_async(self, message: str, timeout: float = float(os.environ.get("SERENITY_NNN_QUERY_TIMEOUT", "15.0"))) -> str:
         """Vault-first NNN query — the main auto-memory call for each turn.
 
         Vault search runs first (cheap). If vault finds relevant notes, their

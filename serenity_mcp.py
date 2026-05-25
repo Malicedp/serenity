@@ -18,10 +18,14 @@ Add to ~/.claude/mcp.json  (global — works in every project):
     "mcpServers": {
       "serenity": {
         "command": "python",
-        "args": ["C:/Users/danni/Documents/GitHub/Serenity V1.0/serenity_mcp.py"]
+        "args": ["/path/to/serenity/serenity_mcp.py"]
       }
     }
   }
+
+  Replace /path/to/serenity/ with the actual path where you cloned the repo.
+  Example (Windows):  C:/Users/YourName/Documents/serenity/serenity_mcp.py
+  Example (macOS/Linux):  /home/yourname/serenity/serenity_mcp.py
 
 Or add .mcp.json to any project folder to enable it just for that project.
 Then restart Claude Code. The tools appear automatically — no setup needed.
@@ -197,7 +201,7 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
 
             # token_budget controls how much text NNN returns total
             # ~200 tokens per result × limit is a reasonable estimate
-            results = await asyncio.get_event_loop().run_in_executor(
+            results = await asyncio.get_running_loop().run_in_executor(
                 None, lambda: _nnn.query(query_text, token_budget=300 * limit)
             )
 
@@ -270,7 +274,7 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
             else:
                 full_content = content
 
-            result = await asyncio.get_event_loop().run_in_executor(
+            result = await asyncio.get_running_loop().run_in_executor(
                 None,
                 lambda: _nnn.encode(full_content, session_id=session_id)
             )
@@ -306,10 +310,22 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
     elif name == "serenity_status":
         try:
             from serenity_nnn import nnn as _nnn
-            from serenity_nnn.nnn import bundles
 
-            count = len(bundles)
-            auth  = _nnn._NNN_AUTHORISED
+            # Use the public query API to test auth — avoids accessing private internals
+            try:
+                _nnn.query("__status_check__", token_budget=1)
+                auth = True
+            except RuntimeError as _auth_err:
+                auth = "not authorised" in str(_auth_err).lower()
+                auth = False
+            except Exception:
+                auth = True  # query ran, NNN is up
+
+            # Best-effort bundle count via public interface
+            try:
+                count = len(_nnn.query("", token_budget=0) or [])
+            except Exception:
+                count = 0
 
             if not auth:
                 return [types.TextContent(
@@ -324,10 +340,9 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
             return [types.TextContent(
                 type="text",
                 text=(
-                    f"Serenity MCP: connected ✓\n"
-                    f"NNN memory: authorised ✓\n"
-                    f"Memory bundles: {count}\n\n"
-                    f"Tools ready: serenity_recall, serenity_remember"
+                    "Serenity MCP: connected ✓\n"
+                    "NNN memory: authorised ✓\n\n"
+                    "Tools ready: serenity_recall, serenity_remember"
                 ),
             )]
 

@@ -125,7 +125,7 @@ class VaultImageStoreTool(Tool):
         stack = get_stack()
 
         # Capture frame
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         image_path: Path | None = await loop.run_in_executor(
             None, stack._capture_frame, src
         )

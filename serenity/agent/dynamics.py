@@ -770,8 +770,7 @@ _PERSONALITY_CACHE_TTL = 30.0  # seconds
 
 def _load_personality() -> "PersonalityConfig | None":
     global _personality_cache, _personality_cache_time
-    import time as _time
-    now = _time.monotonic()
+    now = time.monotonic()
     if _personality_cache is not None and (now - _personality_cache_time) < _PERSONALITY_CACHE_TTL:
         return _personality_cache
     try:

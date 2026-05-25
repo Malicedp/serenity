@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import platform
+import sys
 import urllib.request
 import urllib.parse
 import urllib.error
@@ -32,8 +33,23 @@ _PRODUCT_TIER_MAP = {
 
 
 def get_machine_id() -> str:
-    """Deterministic, privacy-safe machine fingerprint."""
-    raw = platform.node() + platform.machine() + platform.system()
+    """Deterministic, privacy-safe machine fingerprint.
+
+    Falls back to additional sources if platform.node() is empty
+    (common in minimal containers / CI environments).
+    """
+    parts = [
+        platform.node(),
+        platform.machine(),
+        platform.system(),
+        platform.processor(),
+    ]
+    # Filter empty strings — join remaining parts so an empty node()
+    # doesn't collapse all fingerprints onto the same SHA256 value.
+    raw = "|".join(p for p in parts if p)
+    if not raw:
+        # Last resort: use the Python executable path as a stable identifier
+        raw = sys.executable or "serenity-fallback"
     return hashlib.sha256(raw.encode()).hexdigest()[:16]
 
 

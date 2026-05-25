@@ -251,7 +251,7 @@ class ScratchpadCloseTool(Tool):
             _, encode_fn, _ = _get_nnn_fns()
             if encode_fn:
                 await _asyncio.wait_for(
-                    _asyncio.get_event_loop().run_in_executor(
+                    _asyncio.get_running_loop().run_in_executor(
                         None, encode_fn, summary, {"source": f"scratchpad:{task_name}"}
                     ),
                     timeout=60,

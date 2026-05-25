@@ -3,18 +3,17 @@ name = "serenity"
 version = "0.1.5.post1"
 description = "A lightweight personal AI assistant framework"
 readme = { file = "README.md", content-type = "text/markdown" }
-requires-python = ">=3.11"
-license = {text = "MIT"}
+requires-python = "~=3.11.0"
+license = {text = "CC-BY-NC-4.0"}
 authors = [
-    {name = "serenity contributors"}
+    {name = "Daniel T Niamke", email = "serenitydev32@gmail.com"}
 ]
-keywords = ["ai", "agent", "chatbot"]
+keywords = ["ai", "agent", "chatbot", "local-ai", "long-term-memory"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: Free for non-commercial use",
     "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
 ]
 
 dependencies = [
@@ -110,8 +109,7 @@ senses = [
     "edge-tts>=6.0.0",              # Microsoft Neural TTS — free, no key, no model download
     "pydub>=0.25.0",                # PCM→OGG/MP3 conversion (DashScope, pydub-based output)
     # ── Eyes (vision stack, CPU-only) ─────────────────────────────────────────
-    "opencv-python>=4.8.0",         # camera feed + Haar cascade face presence
-    "opencv-python>=4.8.0",         # camera frame grab (VideoCapture only)
+    "opencv-python>=4.8.0",         # camera feed, face presence detection, and frame capture
     "mss>=9.0.0",                   # fast screen capture
     "pillow>=10.0.0",               # image I/O
     "imagehash>=4.3.0",             # perceptual change detection (visual memory)

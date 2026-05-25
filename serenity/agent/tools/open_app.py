@@ -58,7 +58,7 @@ class OpenAppTool(Tool):
 
     async def execute(self, app: str, args: str | None = None, **kwargs: Any) -> str:
         import asyncio
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, _launch, app.strip(), (args or "").strip())
 
 
@@ -195,7 +195,7 @@ class MinimiseAppTool(Tool):
 
     async def execute(self, app: str, **kwargs: Any) -> str:
         import asyncio
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, _minimise, app.strip()
         )
 
@@ -290,7 +290,7 @@ class CloseAppTool(Tool):
 
     async def execute(self, app: str, **kwargs: Any) -> str:
         import asyncio
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, _close, app.strip()
         )
 

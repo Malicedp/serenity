@@ -47,8 +47,15 @@ def load_config(config_path: Path | None = None) -> Config:
         try:
             with open(path, encoding="utf-8") as f:
                 data = json.load(f)
-            data = _migrate_config(data)
+            data, _migrated = _migrate_config(data)
             config = Config.model_validate(data)
+            # Persist migrated config so the migration doesn't re-run on every boot
+            if _migrated:
+                try:
+                    save_config(config, path)
+                    logger.info("Config migration saved to {}", path)
+                except Exception as _save_err:
+                    logger.warning("Config migration could not be saved: {}", _save_err)
         except (json.JSONDecodeError, ValueError, pydantic.ValidationError) as e:
             logger.warning(f"Failed to load config from {path}: {e}")
             logger.warning("Using default configuration.")
@@ -125,14 +132,22 @@ def _env_replace(match: re.Match[str]) -> str:
     return value
 
 
-def _migrate_config(data: dict) -> dict:
-    """Migrate old config formats to current."""
+def _migrate_config(data: dict) -> tuple[dict, bool]:
+    """Migrate old config formats to current.
+
+    Returns (migrated_data, was_changed) so the caller knows whether to
+    persist the updated config — previously the migration ran on every
+    startup but never wrote changes to disk, so it re-applied on every boot.
+    """
+    changed = False
+
     # senses.audio.whisper_model "medium" → "small"
     # "small" is the correct default; "medium" (~1.5 GB) was the old installer default
     # and causes OOM on machines with <12 GB free RAM.
     _audio = data.get("senses", {}).get("audio", {})
     if _audio.get("whisper_model") == "medium":
         _audio["whisper_model"] = "small"
+        changed = True
         logger.info(
             "Config migration: senses.audio.whisper_model upgraded 'medium' → 'small' "
             "(edit ~/.serenity/config.json to override)"
@@ -143,6 +158,7 @@ def _migrate_config(data: dict) -> dict:
     exec_cfg = tools.get("exec", {})
     if "restrictToWorkspace" in exec_cfg and "restrictToWorkspace" not in tools:
         tools["restrictToWorkspace"] = exec_cfg.pop("restrictToWorkspace")
+        changed = True
 
     # Move tools.myEnabled / tools.mySet → tools.my.{enable, allowSet}.
     # The old flat keys shipped in the initial MyTool landing; wrapping them in a
@@ -151,11 +167,13 @@ def _migrate_config(data: dict) -> dict:
         my_cfg = tools.setdefault("my", {})
         if "myEnabled" in tools and "enable" not in my_cfg:
             my_cfg["enable"] = tools.pop("myEnabled")
+            changed = True
         else:
             tools.pop("myEnabled", None)
         if "mySet" in tools and "allowSet" not in my_cfg:
             my_cfg["allowSet"] = tools.pop("mySet")
+            changed = True
         else:
             tools.pop("mySet", None)
 
-    return data
+    return data, changed

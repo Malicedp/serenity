@@ -172,10 +172,10 @@ class MinecraftConnectTool(Tool):
         **kwargs: Any,
     ) -> str:
         import asyncio
-        err = await asyncio.get_event_loop().run_in_executor(None, _start_bridge)
+        err = await asyncio.get_running_loop().run_in_executor(None, _start_bridge)
         if err:
             return err
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None,
             lambda: _post("/connect", {
                 "host": host, "port": port,
@@ -200,7 +200,7 @@ class MinecraftDisconnectTool(Tool):
 
     async def execute(self, **kwargs: Any) -> str:
         import asyncio
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/disconnect")
         )
 
@@ -226,7 +226,7 @@ class MinecraftStatusTool(Tool):
 
     async def execute(self, **kwargs: Any) -> str:
         import asyncio
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, lambda: _get("/status")
         )
 
@@ -253,7 +253,7 @@ class MinecraftChatTool(Tool):
 
     async def execute(self, message: str, **kwargs: Any) -> str:
         import asyncio
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/chat", {"message": message})
         )
 
@@ -288,7 +288,7 @@ class MinecraftNavigateTool(Tool):
         data: dict[str, Any] = {"x": x, "y": y, "z": z}
         if range:
             data["range"] = range
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/navigate", data)
         )
 
@@ -307,7 +307,7 @@ class MinecraftStopTool(Tool):
 
     async def execute(self, **kwargs: Any) -> str:
         import asyncio
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/stop")
         )
 
@@ -360,7 +360,7 @@ class MinecraftMineTool(Tool):
             data.update({"x": x, "y": y, "z": z})
         elif type:
             data["type"] = type
-        result = await asyncio.get_event_loop().run_in_executor(
+        result = await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/mine", data, timeout=30)
         )
         return result + _TICK_NOW
@@ -393,7 +393,7 @@ class MinecraftAttackTool(Tool):
     async def execute(self, name: str | None = None, **kwargs: Any) -> str:
         import asyncio
         data = {"name": name} if name else {}
-        result = await asyncio.get_event_loop().run_in_executor(
+        result = await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/attack", data)
         )
         return result + _TICK_NOW
@@ -425,7 +425,7 @@ class MinecraftEquipTool(Tool):
 
     async def execute(self, item: str, destination: str = "hand", **kwargs: Any) -> str:
         import asyncio
-        result = await asyncio.get_event_loop().run_in_executor(
+        result = await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/equip", {"item": item, "destination": destination})
         )
         return result + _TICK_NOW
@@ -454,7 +454,7 @@ class MinecraftDropTool(Tool):
         data: dict[str, Any] = {"item": item}
         if count:
             data["count"] = count
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/drop", data)
         )
 
@@ -486,7 +486,7 @@ class MinecraftEatTool(Tool):
     async def execute(self, item: str | None = None, **kwargs: Any) -> str:
         import asyncio
         data = {"item": item} if item else {}
-        result = await asyncio.get_event_loop().run_in_executor(
+        result = await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/eat", data, timeout=10)
         )
         return result + _TICK_NOW
@@ -516,7 +516,7 @@ class MinecraftCraftTool(Tool):
 
     async def execute(self, item: str, count: int = 1, **kwargs: Any) -> str:
         import asyncio
-        result = await asyncio.get_event_loop().run_in_executor(
+        result = await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/craft", {"item": item, "count": count}, timeout=15)
         )
         return result + _TICK_NOW
@@ -551,7 +551,7 @@ class MinecraftScanBlocksTool(Tool):
 
     async def execute(self, type: str, max_distance: int = 32, count: int = 10, **kwargs: Any) -> str:
         import asyncio
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, lambda: _get("/scan_blocks", {"type": type, "maxDistance": max_distance, "count": count})
         )
 
@@ -588,7 +588,7 @@ class MinecraftScanEntitiesTool(Tool):
     async def execute(self, filter: str | None = None, **kwargs: Any) -> str:
         import asyncio
         params = {"filter": filter} if filter else {}
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, lambda: _get("/scan_entities", params)
         )
 
@@ -626,7 +626,7 @@ class MinecraftEventsTool(Tool):
     async def execute(self, since: str | None = None, **kwargs: Any) -> str:
         import asyncio
         params = {"since": since} if since else {}
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, lambda: _get("/events", params)
         )
 
@@ -673,7 +673,7 @@ class MinecraftSenseTool(Tool):
 
     async def execute(self, max_distance: int = 20, event_count: int = 15, **kwargs: Any) -> str:
         import asyncio
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, lambda: _get("/sense", {"maxDistance": max_distance, "eventCount": event_count})
         )
 
@@ -726,7 +726,7 @@ class MinecraftNavigateWaitTool(Tool):
         **kwargs: Any,
     ) -> str:
         import asyncio
-        result = await asyncio.get_event_loop().run_in_executor(
+        result = await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post(
                 "/navigate_wait",
                 {"x": x, "y": y, "z": z, "range": range},
@@ -786,7 +786,7 @@ class MinecraftFightTool(Tool):
         data: dict[str, Any] = {"timeout": timeout, "retreat_hp": retreat_hp}
         if name:
             data["name"] = name
-        result = await asyncio.get_event_loop().run_in_executor(
+        result = await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/fight", data, timeout=timeout + 5.0)
         )
         return result + _TICK_NOW
@@ -836,7 +836,7 @@ class MinecraftPlaceBlockTool(Tool):
         **kwargs: Any,
     ) -> str:
         import asyncio
-        result = await asyncio.get_event_loop().run_in_executor(
+        result = await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/place_block", {
                 "ref_x": ref_x, "ref_y": ref_y, "ref_z": ref_z,
                 "face_x": face_x, "face_y": face_y, "face_z": face_z,
@@ -899,7 +899,7 @@ class MinecraftOpenContainerTool(Tool):
         if item:
             data["item"] = item
             data["count"] = count
-        result = await asyncio.get_event_loop().run_in_executor(
+        result = await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/open_container", data, timeout=15)
         )
         return result + _TICK_NOW
@@ -944,7 +944,7 @@ class MinecraftSleepTool(Tool):
         data: dict[str, Any] = {}
         if x is not None:
             data.update({"x": x, "y": y, "z": z})
-        result = await asyncio.get_event_loop().run_in_executor(
+        result = await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/sleep", data, timeout=20)
         )
         return result + _TICK_NOW
@@ -964,7 +964,7 @@ class MinecraftWakeTool(Tool):
 
     async def execute(self, **kwargs: Any) -> str:
         import asyncio
-        result = await asyncio.get_event_loop().run_in_executor(
+        result = await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/wake")
         )
         return result + _TICK_NOW
@@ -1008,7 +1008,7 @@ class MinecraftActivateItemTool(Tool):
 
     async def execute(self, offhand: str | None = None, **kwargs: Any) -> str:
         import asyncio
-        result = await asyncio.get_event_loop().run_in_executor(
+        result = await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/activate_item", {"offhand": offhand == "true"})
         )
         return result + _TICK_NOW
@@ -1031,7 +1031,7 @@ class MinecraftDeactivateItemTool(Tool):
 
     async def execute(self, **kwargs: Any) -> str:
         import asyncio
-        result = await asyncio.get_event_loop().run_in_executor(
+        result = await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/deactivate_item")
         )
         return result + _TICK_NOW
@@ -1074,7 +1074,7 @@ class MinecraftActivateBlockTool(Tool):
 
     async def execute(self, x: str, y: str, z: str, **kwargs: Any) -> str:
         import asyncio
-        result = await asyncio.get_event_loop().run_in_executor(
+        result = await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/activate_block", {"x": x, "y": y, "z": z})
         )
         return result + _TICK_NOW
@@ -1118,7 +1118,7 @@ class MinecraftPlanTool(Tool):
 
     async def execute(self, **kwargs: Any) -> str:
         import asyncio
-        result = await asyncio.get_event_loop().run_in_executor(
+        result = await asyncio.get_running_loop().run_in_executor(
             None, lambda: _get("/plan")
         )
         return (
@@ -1171,7 +1171,7 @@ class MinecraftTickTool(Tool):
 
     async def execute(self, **kwargs: Any) -> str:
         import asyncio
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, lambda: _get("/tick")
         )
 
@@ -1210,7 +1210,7 @@ class MinecraftAutoSurviveTool(Tool):
 
     async def execute(self, **kwargs: Any) -> str:
         import asyncio
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/auto_survive")
         )
 
@@ -1256,7 +1256,7 @@ class MinecraftGoalSetTool(Tool):
             parsed = _json.loads(goals)
         except Exception:
             parsed = [g.strip() for g in goals.split(",") if g.strip()]
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/goal/set", {"goals": parsed})
         )
 
@@ -1279,7 +1279,7 @@ class MinecraftGoalDoneTool(Tool):
 
     async def execute(self, **kwargs: Any) -> str:
         import asyncio
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, lambda: _post("/goal/done")
         )
 
@@ -1305,7 +1305,7 @@ class MinecraftGoalGetTool(Tool):
 
     async def execute(self, **kwargs: Any) -> str:
         import asyncio
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, lambda: _get("/goal/get")
         )
 
@@ -1348,6 +1348,6 @@ class MinecraftBootTool(Tool):
 
     async def execute(self, **kwargs: Any) -> str:
         import asyncio
-        return await asyncio.get_event_loop().run_in_executor(
+        return await asyncio.get_running_loop().run_in_executor(
             None, lambda: _get("/boot")
         )

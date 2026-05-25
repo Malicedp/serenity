@@ -51,7 +51,7 @@ def _pg():
 def _run_sync(fn):
     """Run a blocking pyautogui call in a thread executor."""
     async def wrapper(*args, **kwargs):
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, lambda: fn(*args, **kwargs))
     return wrapper
 
@@ -86,7 +86,7 @@ class MouseMoveTool(Tool):
             pg = _pg()
             pg.moveTo(x, y, duration=duration)
             return f"Mouse moved to ({x}, {y})"
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, _do)
 
 
@@ -138,7 +138,7 @@ class MouseClickTool(Tool):
             label = "double-clicked" if clicks == 2 else "clicked"
             return f"Mouse {label} {btn} at ({x}, {y})"
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, _do)
 
 
@@ -173,7 +173,7 @@ class MouseScrollTool(Tool):
             direction = "up" if amount > 0 else "down"
             return f"Scrolled {direction} by {abs(amount)} at ({x}, {y})"
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, _do)
 
 
@@ -209,7 +209,7 @@ class MouseDragTool(Tool):
             pg.dragTo(x2, y2, duration=duration, button="left")
             return f"Dragged from ({x1}, {y1}) to ({x2}, {y2})"
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, _do)
 
 
@@ -244,7 +244,7 @@ class KeyboardTypeTool(Tool):
             preview = text[:40] + ("…" if len(text) > 40 else "")
             return f"Typed: '{preview}' ({len(text)} chars)"
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, _do)
 
 
@@ -283,7 +283,7 @@ class KeyboardHotkeyTool(Tool):
             pg.hotkey(*key_list)
             return f"Hotkey: {' + '.join(key_list)}"
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, _do)
 
 
@@ -321,7 +321,7 @@ class KeyboardPressTool(Tool):
             pg.press(key.strip().lower(), presses=presses)
             return f"Pressed '{key}' × {presses}"
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, _do)
 
 
@@ -369,5 +369,5 @@ class FindOnScreenTool(Tool):
             except Exception as e:
                 return f"find_on_screen error: {e}"
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, _do)

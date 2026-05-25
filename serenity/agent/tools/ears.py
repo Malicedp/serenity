@@ -121,7 +121,7 @@ class EarsOpenTool(Tool):
         return await self._capture_once(src, dur, tag_list)
 
     async def _capture_once(self, source: str, duration_s: float, tags: list[str]) -> str:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         session_id = f"ears_{int(time.time())}"
 
         # Capture or load audio
@@ -184,7 +184,7 @@ async def _continuous_loop(source: str, tags: list[str], stop_event: asyncio.Eve
 
     while not stop_event.is_set():
         try:
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             audio_path = await loop.run_in_executor(None, _record_mic, chunk_s)
             transcript = await _transcribe(audio_path)
 
@@ -284,7 +284,7 @@ class EarsRecallTool(Tool):
         if search_mode == "semantic":
             try:
                 from serenity.senses.clap_embedder import embed_text
-                loop = asyncio.get_event_loop()
+                loop = asyncio.get_running_loop()
                 emb = await loop.run_in_executor(None, embed_text, query)
                 results = audio_rag.query_semantic(emb, limit=limit)
             except Exception as e:

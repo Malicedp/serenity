@@ -300,21 +300,46 @@ class MemoryStore:
         return entries
 
     def _read_last_entry(self) -> dict[str, Any] | None:
-        """Read the last entry from the JSONL file efficiently."""
+        """Read the last entry from the JSONL file efficiently.
+
+        Tries a fast tail-read first (4 KB). Falls back to a full sequential
+        scan if the tail read cannot find a valid JSON line — this handles the
+        edge case where the last entry is larger than the read window.
+        """
         try:
             with open(self.history_file, "rb") as f:
                 f.seek(0, 2)
                 size = f.tell()
                 if size == 0:
                     return None
+
+                # Fast path: read the last 4 KB and try to parse the last line
                 read_size = min(size, 4096)
                 f.seek(size - read_size)
-                data = f.read().decode("utf-8")
-                lines = [l for l in data.split("\n") if l.strip()]
-                if not lines:
-                    return None
-                return json.loads(lines[-1])
-        except (FileNotFoundError, json.JSONDecodeError, UnicodeDecodeError):
+                tail = f.read().decode("utf-8", errors="replace")
+                lines = [ln for ln in tail.split("\n") if ln.strip()]
+                if lines:
+                    try:
+                        return json.loads(lines[-1])
+                    except json.JSONDecodeError:
+                        pass  # last entry is truncated — fall through to full scan
+
+                # Slow path: full sequential scan (large entry > 4 KB)
+                f.seek(0)
+                last: dict[str, Any] | None = None
+                for raw_line in f:
+                    line = raw_line.decode("utf-8", errors="replace").strip()
+                    if not line:
+                        continue
+                    try:
+                        last = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                return last
+
+        except FileNotFoundError:
+            return None
+        except Exception:
             return None
 
     def _write_entries(self, entries: list[dict[str, Any]]) -> None:

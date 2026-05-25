@@ -169,7 +169,7 @@ class FasterWhisperTranscriptionProvider:
             logger.error("Audio file not found: {}", file_path)
             return ""
         try:
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             return await loop.run_in_executor(None, self._transcribe_sync, path)
         except RuntimeError as e:
             logger.error("Faster Whisper not available: {}", e)

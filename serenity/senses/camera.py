@@ -114,7 +114,7 @@ class VisionStack:
     async def snapshot(self, source: str = "camera") -> str:
         """Capture a frame and describe it with minicpm-v4.6 via Ollama."""
         import asyncio
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         description, _ = await loop.run_in_executor(None, self._snapshot_sync, source, False)
         return description
 
@@ -125,7 +125,7 @@ class VisionStack:
         Returns (description, path) — path is None if capture failed.
         """
         import asyncio
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._snapshot_sync, source, True)
 
     async def snapshot_ascii(self, source: str = "screen", width: int = 120) -> str:
@@ -135,7 +135,7 @@ class VisionStack:
         Useful for text-only LLMs that don't have vision capability.
         """
         import asyncio
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._snapshot_ascii_sync, source, width)
 
     def _snapshot_ascii_sync(self, source: str, width: int) -> str:
