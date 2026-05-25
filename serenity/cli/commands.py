@@ -863,6 +863,12 @@ def gateway(
 
     # ── Licence check ─────────────────────────────────────────────────────────
     _check_licence(config)
+    # Save config so instance_id and last_validated timestamp persist to disk
+    try:
+        from serenity.config.loader import get_config_path, save_config
+        save_config(config, get_config_path())
+    except Exception:
+        pass
     # ─────────────────────────────────────────────────────────────────────────
 
     # ── Auto-tune context window for the configured model ─────────────────────

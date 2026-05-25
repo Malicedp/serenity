@@ -1225,9 +1225,9 @@ def _collect_licence_key(config: Config) -> None:
 
         key = raw.upper()
 
-        # Basic sanity check — Lemon Squeezy keys are UUID-style (e.g. XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)
+        # Basic sanity check — Lemon Squeezy keys are UUID format (8-4-4-4-12 hex)
         import re as _re
-        if not _re.match(r'^[A-F0-9\-]{10,}$', key):
+        if not _re.match(r'^[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}$', key):
             console.print(
                 "\n[red]✗ Invalid format.[/red] "
                 "Licence keys should look like: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX\n"
