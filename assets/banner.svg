@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 280" width="900" height="280">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#07050f"/>
+      <stop offset="60%" stop-color="#120a2a"/>
+      <stop offset="100%" stop-color="#0c1a2e"/>
+    </linearGradient>
+    <linearGradient id="wingTL" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#1e1050" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient id="wingBL" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="wingTR" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#1e1050" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient id="wingBR" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="titleGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#e2d9f3"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#bfdbfe"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softglow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="280" rx="14" fill="url(#bgGrad)"/>
+
+  <!-- Subtle dot grid -->
+  <pattern id="dots" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+    <circle cx="1" cy="1" r="0.8" fill="#ffffff" opacity="0.04"/>
+  </pattern>
+  <rect width="900" height="280" rx="14" fill="url(#dots)"/>
+
+  <!-- Ambient glow behind butterfly -->
+  <ellipse cx="200" cy="155" rx="90" ry="70" fill="#7c3aed" opacity="0.07" filter="url(#softglow)"/>
+
+  <!-- === BUTTERFLY === -->
+
+  <!-- Upper-left wing -->
+  <path d="M 198 148
+           C 175 118 135 95 95 105
+           C 65 112 55 140 80 160
+           C 105 178 160 168 195 155 Z"
+        fill="url(#wingTL)" opacity="0.92" filter="url(#glow)"/>
+  <!-- Upper-left wing shimmer -->
+  <path d="M 196 148
+           C 178 128 152 116 128 122
+           C 112 128 116 148 148 155 Z"
+        fill="#d8b4fe" opacity="0.18"/>
+  <!-- Upper-left wing vein -->
+  <path d="M 196 150 C 165 133 130 120 100 118"
+        stroke="#c4b5fd" stroke-width="0.8" fill="none" opacity="0.3" stroke-linecap="round"/>
+
+  <!-- Lower-left wing -->
+  <path d="M 194 162
+           C 168 192 148 235 168 255
+           C 184 270 205 242 202 178 Z"
+        fill="url(#wingBL)" opacity="0.82"/>
+  <!-- Lower-left shimmer -->
+  <path d="M 194 165
+           C 176 195 168 225 180 242
+           C 190 252 200 228 200 180 Z"
+        fill="#67e8f9" opacity="0.16"/>
+
+  <!-- Upper-right wing -->
+  <path d="M 202 148
+           C 225 118 265 95 305 105
+           C 335 112 345 140 320 160
+           C 295 178 240 168 205 155 Z"
+        fill="url(#wingTR)" opacity="0.92" filter="url(#glow)"/>
+  <!-- Upper-right wing shimmer -->
+  <path d="M 204 148
+           C 222 128 248 116 272 122
+           C 288 128 284 148 252 155 Z"
+        fill="#d8b4fe" opacity="0.18"/>
+  <!-- Upper-right wing vein -->
+  <path d="M 204 150 C 235 133 270 120 300 118"
+        stroke="#c4b5fd" stroke-width="0.8" fill="none" opacity="0.3" stroke-linecap="round"/>
+
+  <!-- Lower-right wing -->
+  <path d="M 206 162
+           C 232 192 252 235 232 255
+           C 216 270 195 242 198 178 Z"
+        fill="url(#wingBR)" opacity="0.82"/>
+  <!-- Lower-right shimmer -->
+  <path d="M 206 165
+           C 224 195 232 225 220 242
+           C 210 252 200 228 200 180 Z"
+        fill="#67e8f9" opacity="0.16"/>
+
+  <!-- Body -->
+  <ellipse cx="200" cy="153" rx="4.5" ry="26" fill="#ede9fe" filter="url(#glow)"/>
+  <ellipse cx="200" cy="148" rx="6" ry="8" fill="#c4b5fd" filter="url(#glow)"/>
+
+  <!-- Antennae -->
+  <path d="M 197 127 Q 180 102 162 90" stroke="#a78bfa" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <circle cx="160" cy="88" r="3.5" fill="#8b5cf6" filter="url(#glow)"/>
+  <path d="M 203 127 Q 220 102 238 90" stroke="#a78bfa" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <circle cx="240" cy="88" r="3.5" fill="#8b5cf6" filter="url(#glow)"/>
+
+  <!-- === TEXT === -->
+
+  <!-- Title -->
+  <text x="580" y="118"
+        font-family="'Segoe UI', 'SF Pro Display', -apple-system, system-ui, sans-serif"
+        font-size="62" font-weight="700" letter-spacing="12"
+        fill="url(#titleGrad)" text-anchor="middle">SERENITY</text>
+
+  <!-- Divider -->
+  <line x1="428" y1="136" x2="732" y2="136" stroke="#7c3aed" stroke-width="0.8" opacity="0.5"/>
+
+  <!-- Tagline -->
+  <text x="580" y="166"
+        font-family="'Segoe UI', system-ui, sans-serif"
+        font-size="13.5" letter-spacing="3.5"
+        fill="#a78bfa" text-anchor="middle">THINK ONCE · UNDERSTAND EVERYTHING</text>
+
+  <!-- Description line -->
+  <text x="580" y="202"
+        font-family="'Segoe UI', system-ui, sans-serif"
+        font-size="12" letter-spacing="1.5"
+        fill="#4b5563" text-anchor="middle">Memory  ·  Voice  ·  Vision  ·  Cross-domain Reasoning  ·  Local</text>
+
+  <!-- Bottom credit -->
+  <text x="580" y="248"
+        font-family="'Segoe UI', system-ui, sans-serif"
+        font-size="10.5" letter-spacing="1"
+        fill="#374151" text-anchor="middle">by Sera-Team  ·  open to the community</text>
+
+  <!-- Floating particles -->
+  <circle cx="430" cy="48"  r="1.5" fill="#8b5cf6" opacity="0.6"/>
+  <circle cx="720" cy="40"  r="1.0" fill="#22d3ee" opacity="0.7"/>
+  <circle cx="810" cy="70"  r="2.0" fill="#a78bfa"  opacity="0.4"/>
+  <circle cx="470" cy="248" r="1.5" fill="#8b5cf6" opacity="0.35"/>
+  <circle cx="860" cy="195" r="1.0" fill="#22d3ee" opacity="0.55"/>
+  <circle cx="385" cy="258" r="1.0" fill="#a78bfa"  opacity="0.3"/>
+  <circle cx="858" cy="130" r="1.5" fill="#8b5cf6" opacity="0.45"/>
+  <circle cx="415" cy="218" r="1.0" fill="#a78bfa"  opacity="0.4"/>
+  <circle cx="775" cy="248" r="2.0" fill="#22d3ee" opacity="0.35"/>
+  <circle cx="500" cy="32"  r="1.0" fill="#22d3ee" opacity="0.55"/>
+  <circle cx="682" cy="258" r="1.5" fill="#8b5cf6" opacity="0.4"/>
+  <circle cx="345" cy="42"  r="1.0" fill="#a78bfa"  opacity="0.5"/>
+  <circle cx="860" cy="60"  r="1.0" fill="#8b5cf6" opacity="0.3"/>
+  <circle cx="395" cy="82"  r="1.0" fill="#22d3ee" opacity="0.4"/>
+  <circle cx="760" cy="165" r="1.5" fill="#a78bfa"  opacity="0.3"/>
+</svg>

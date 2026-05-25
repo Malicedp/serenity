@@ -1,0 +1,108 @@
+# ── Personal agent data — never push ─────────────────────────
+Vault Memories/
+.serenity/
+finetune/
+.gitnexus/
+
+# ── Internal dev tools — stay private ────────────────────────
+CLAUDE.md
+core_agent_lines.sh
+_vault_reindex.py
+build_protected.py
+.claude/
+
+# Project-specific
+.worktrees/
+.assets
+
+# Voice clone drop zone — audio files stay private
+sense/voice_clone/*.wav
+sense/voice_clone/*.mp3
+sense/voice_clone/*.flac
+sense/voice_clone/*.ogg
+sense/voice_clone/*.m4a
+sense/voice_clone/*.aac
+.docs
+.env
+.web
+.orion
+
+# Python bytecode & caches
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+__pycache__/
+*.egg-info/
+*.egg
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.dmypy.json
+dmypy.json
+.tox/
+.nox/
+.hypothesis/
+
+# Build & packaging
+dist/
+build/
+*.manifest
+*.spec
+pip-wheel-metadata/
+share/python-wheels/
+
+# Test & coverage
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+
+# Lock files (project policy)
+poetry.lock
+uv.lock
+
+# Jupyter
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+.directory
+
+# Editors & IDEs (local workspace / user settings)
+.vscode/
+.cursor/
+.idea/
+.fleet/
+*.code-workspace
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+nano.*.save
+
+# Environment & secrets (keep examples tracked if needed)
+.env.*
+!.env.example
+
+# Logs & temp
+*.log
+logs/
+tmp/
+temp/
+*.tmp
