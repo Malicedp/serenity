@@ -105,6 +105,32 @@ These aren't cherry-picked examples — they're the natural result of a memory s
 
 ---
 
+## How Serenity compares
+
+| | Serenity | AutoGPT | Open Interpreter | MemGPT / Letta | Open WebUI |
+|---|:---:|:---:|:---:|:---:|:---:|
+| **Fully local inference** | ✅ | ⚠️ needs API key | ⚠️ needs API key | ⚠️ needs API key | ✅ |
+| **Cross-session memory** | ✅ NNN vector store | ❌ | ❌ | ✅ | ❌ |
+| **Remembers across domains** | ✅ | ❌ | ❌ | ⚠️ limited | ❌ |
+| **Voice (wake-word + STT + TTS)** | ✅ | ❌ | ❌ | ❌ | ⚠️ TTS only |
+| **Vision (screen + camera)** | ✅ MiniCPM-V 4.6 | ❌ | ⚠️ screenshot only | ❌ | ⚠️ image input |
+| **Telegram / WhatsApp** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Obsidian vault integration** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Dialect / code-switching** | ✅ auto-detected | ❌ | ❌ | ❌ | ❌ |
+| **Autonomous cron scheduling** | ✅ | ⚠️ task-based | ❌ | ⚠️ limited | ❌ |
+| **Claude Code MCP integration** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Emotional dynamics** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Drop-in skill system** | ✅ | ⚠️ plugins | ❌ | ⚠️ tools | ⚠️ functions |
+| **Research paper** | ✅ [S.E.R.A](https://doi.org/10.5281/zenodo.20382162) | ❌ | ❌ | ✅ | ❌ |
+| **One-click launcher** | ✅ start.bat / start.sh | ❌ | ❌ | ❌ | ✅ Docker |
+| **No cloud dependency** | ✅ 100% offline | ❌ | ❌ | ❌ | ✅ |
+
+> ⚠️ = partial support or requires extra setup
+
+The core difference: most agents treat memory as a feature bolted onto a chatbot. Serenity treats memory as the agent's primary state — every session compounds into the next.
+
+---
+
 ## Code-switching and dialect adaptation
 
 Serenity doesn't talk at you in one fixed register. She reads how you communicate and eases into it naturally.
