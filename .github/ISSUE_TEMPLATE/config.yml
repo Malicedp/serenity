@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/Malicedp/serenity/tree/main/docs
+    about: Read the docs before opening an issue — your question may already be answered.
+  - name: Getting Started
+    url: https://github.com/Malicedp/serenity/blob/main/GETTING_STARTED.md
+    about: First-run setup guide.
+  - name: Email
+    url: mailto:serenitydev32@gmail.com
+    about: For commercial licensing or private matters.
