@@ -19,6 +19,7 @@
 [![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)]()
 [![Paper](https://img.shields.io/badge/Paper-Zenodo-blue?style=flat-square)](https://doi.org/10.5281/zenodo.20382162)
 [![Paper](https://img.shields.io/badge/Paper-Figshare-orange?style=flat-square)](https://doi.org/10.6084/m9.figshare.32399520)
+[![Star History](https://img.shields.io/github/stars/Malicedp/serenity?style=flat-square&label=Stars&color=yellow)](https://github.com/Malicedp/serenity/stargazers)
 
 <br/>
 
@@ -411,6 +412,7 @@ Full terms in [LICENSE](LICENSE) and [TERMS.md](TERMS.md).
 | 📧 **Contact** | [serenitydev32@gmail.com](mailto:serenitydev32@gmail.com) |
 | 📋 **Terms** | [TERMS.md](TERMS.md) |
 | 🌿 **Community** | [Fork on GitHub](https://github.com/Malicedp/serenity/fork) |
+| ⭐ **Star history** | [![Star History Chart](https://api.star-history.com/svg?repos=Malicedp/serenity&type=Date)](https://star-history.com/#Malicedp/serenity&Date) |
 
 ---
 
