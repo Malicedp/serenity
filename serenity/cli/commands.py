@@ -1835,7 +1835,6 @@ def visualise():
         console.print("[red]serenity_nnn not installed. Run: pip install -e .[/red]")
         raise typer.Exit(1)
 
-    import os as _os
     # Suppress ChromaDB's orphaned-segment delete warnings and telemetry noise
     import logging as _logging
     _logging.getLogger("chromadb").setLevel(_logging.ERROR)
@@ -1913,7 +1912,7 @@ def visualise():
     if sys.platform == "win32":
         try:
             import embedding_atlas.cache as _ea_cache
-            import inspect, types
+            import inspect
 
             def _make_patched(fn):
                 src = inspect.getsource(fn)

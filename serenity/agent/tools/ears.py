@@ -311,7 +311,6 @@ def _record_mic(duration_s: float) -> Path:
     try:
         import sounddevice as sd  # type: ignore
         import scipy.io.wavfile as wav  # type: ignore
-        import numpy as np
     except ImportError as exc:
         raise RuntimeError(
             "Microphone capture requires 'sounddevice' and 'scipy'.\n"

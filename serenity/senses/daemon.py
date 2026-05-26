@@ -34,7 +34,6 @@ from typing import TYPE_CHECKING, Any
 from loguru import logger
 
 if TYPE_CHECKING:
-    from serenity.bus.events import InboundMessage
     from serenity.bus.queue import MessageBus
 
 # ── Singleton state ───────────────────────────────────────────────────────────

@@ -555,7 +555,6 @@ class BarkTTSProvider:
 
         def _run() -> bool:
             try:
-                import numpy as np
                 from scipy.io.wavfile import write as wav_write
                 import os as _os
                 if self.small:
@@ -1252,7 +1251,7 @@ class DeepgramTTSProvider:
                     sample_rate=self.sample_rate,
                 )
                 output_path.parent.mkdir(parents=True, exist_ok=True)
-                response = client.speak.v("1").save(
+                client.speak.v("1").save(
                     str(output_path),
                     {"text": text[:2000]},
                     options,

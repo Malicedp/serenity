@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import os
 import subprocess
-import sys
 from pathlib import Path
 from typing import Any
 
@@ -109,8 +108,6 @@ def _launch(app: str, args: str) -> str:
 
 def _launch_entry(entry: dict, args: str) -> str | None:
     """Dispatch to the right launcher based on entry type. Returns result or None if stale."""
-    entry_type = entry.get("type", "exe")
-
     if "exe" in entry:
         exe = Path(entry["exe"])
         try:

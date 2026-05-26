@@ -15,8 +15,6 @@ from loguru import logger
 from serenity.utils.prompt_templates import render_template
 from serenity.utils.helpers import ensure_dir, estimate_message_tokens, estimate_prompt_tokens_chain, strip_think
 
-from serenity.agent.runner import AgentRunSpec, AgentRunner
-from serenity.agent.tools.registry import ToolRegistry
 from serenity.utils.gitstore import GitStore
 
 if TYPE_CHECKING:

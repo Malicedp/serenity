@@ -19,14 +19,11 @@ Tools:
 from __future__ import annotations
 
 import asyncio
-import time
 from typing import Any
 
-from loguru import logger
 
 from serenity.agent.tools.base import Tool, tool_parameters
 from serenity.agent.tools.schema import (
-    BooleanSchema,
     IntegerSchema,
     NumberSchema,
     StringSchema,

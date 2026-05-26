@@ -585,7 +585,6 @@ class ContextBuilder:
             except OSError:
                 continue
 
-            text_lower = text.lower()
             matched_lines: list[str] = []
             for line in text.splitlines():
                 if any(kw in line.lower() for kw in keywords):
@@ -660,7 +659,6 @@ class ContextBuilder:
             except OSError:
                 continue
 
-            text_lower = text.lower()
             matched_lines: list[str] = []
             for line in text.splitlines():
                 if any(kw in line.lower() for kw in keywords):

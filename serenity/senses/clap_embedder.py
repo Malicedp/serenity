@@ -8,7 +8,6 @@ Produces 512-dim embeddings suitable for cosine similarity search in AudioRAG.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from loguru import logger
 
