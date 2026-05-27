@@ -44,11 +44,11 @@
 <table>
 <tr>
 <td align="center" width="50%">
-<img src="assets/screenshot1.png" width="100%" alt="Serenity remembering preferences via Telegram"/>
+<img src="assets/screenshot1.png" width="75%" alt="Serenity remembering preferences via Telegram"/>
 <br/><sub><b>Remembers what you tell it — favourite colour, interests, anything</b></sub>
 </td>
 <td align="center" width="50%">
-<img src="assets/screenshot2.png" width="100%" alt="Serenity reacts to gaining vision capability"/>
+<img src="assets/screenshot2.png" width="75%" alt="Serenity reacts to gaining vision capability"/>
 <br/><sub><b>Gains new capabilities at runtime — here reacting to getting eyes for the first time</b></sub>
 </td>
 </tr>
