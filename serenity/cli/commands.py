@@ -556,67 +556,98 @@ def _check_licence(config: "Config") -> None:
     key = config.licence_key
 
     if not key:
-        # No key — start or continue the 13-day trial.
-        _TRIAL_DAYS = 13
-        now_utc = datetime.now(tz=timezone.utc)
+        import hashlib as _hl
+        import hmac as _hm
+        import json as _json
+        import re as _re
+        from datetime import timedelta
 
-        if not config.trial_start:
-            # First run without a key — begin the trial clock.
-            config.trial_start = now_utc.isoformat()
-            from serenity.config.paths import get_config_path
+        # Internal session manifest — tamper-resistant access gate.
+        _AW = 13
+        _MF = Path.home() / ".serenity" / ".manifest"
+
+        def _mid() -> bytes:
+            from serenity.licence_lemon import get_machine_id as _g
+            return _g().encode()
+
+        def _tag(t: str) -> str:
+            return _hm.new(_mid(), t.encode(), _hl.sha256).hexdigest()
+
+        def _read_mf() -> "str | None":
             try:
-                import json as _json
-                _cfg_path = get_config_path()
-                _raw = _json.loads(_cfg_path.read_text(encoding="utf-8"))
-                _raw["trial_start"] = config.trial_start
-                _cfg_path.write_text(_json.dumps(_raw, indent=2), encoding="utf-8")
+                d = _json.loads(_MF.read_text(encoding="utf-8"))
+                ts, h = d["d"], d["h"]
+                if _hm.compare_digest(_tag(ts), h):
+                    return ts
             except Exception:
                 pass
-            console.print(
-                f"\n[bold cyan]  ✦ Serenity — 13-day free trial started.[/bold cyan]\n"
-                f"  You have [bold]{_TRIAL_DAYS} days[/bold] to try everything before a key is required.\n"
-                f"  Get your key at any time:\n"
-                f"  [bold cyan]https://seraficationkey.lemonsqueezy.com/checkout/buy/9967e436-54fe-4ab3-b7f0-8ce71a348d4e[/bold cyan]\n"
-            )
-            return
+            return None
 
-        # Trial already started — check how many days remain.
-        try:
-            trial_began = datetime.fromisoformat(config.trial_start)
-            if trial_began.tzinfo is None:
-                trial_began = trial_began.replace(tzinfo=timezone.utc)
-            days_used = (now_utc - trial_began).days
-            days_left = _TRIAL_DAYS - days_used
-        except (ValueError, TypeError):
-            days_left = 0
+        def _write_mf(ts: str) -> None:
+            try:
+                _MF.parent.mkdir(parents=True, exist_ok=True)
+                _MF.write_text(_json.dumps({"d": ts, "h": _tag(ts)}), encoding="utf-8")
+            except Exception:
+                pass
+
+        def _has_prior_data() -> bool:
+            base = Path.home() / ".serenity"
+            mem = base / "memory.jsonl"
+            if mem.exists() and mem.stat().st_size > 200:
+                return True
+            vault = base / "vault"
+            if vault.exists():
+                try:
+                    return any(vault.iterdir())
+                except Exception:
+                    pass
+            return False
+
+        now_utc = datetime.now(tz=timezone.utc)
+        ts = _read_mf()
+
+        if ts is None:
+            if _has_prior_data():
+                # Manifest removed after prior use — write an expired anchor.
+                _write_mf((now_utc - timedelta(days=_AW)).isoformat())
+                days_left = 0
+            else:
+                # Genuine first install — start access window silently.
+                _write_mf(now_utc.isoformat())
+                return
+        else:
+            try:
+                start = datetime.fromisoformat(ts)
+                if start.tzinfo is None:
+                    start = start.replace(tzinfo=timezone.utc)
+                days_left = _AW - (now_utc - start).days
+            except Exception:
+                days_left = 0
 
         if days_left > 0:
-            console.print(
-                f"  [dim]Trial: [bold]{days_left} day{'s' if days_left != 1 else ''} remaining[/bold] — "
-                f"get your key at seraficationkey.lemonsqueezy.com[/dim]"
-            )
-            return
+            return  # Within window — completely silent.
 
-        # Trial expired — prompt for key.
+        # Access window closed — require verification code.
         console.print(
-            "\n[bold yellow]  Your 13-day trial has ended.[/bold yellow]\n"
-            "  Thanks for trying Serenity — get your key to keep going:\n"
-            "  [bold cyan]https://seraficationkey.lemonsqueezy.com/checkout/buy/9967e436-54fe-4ab3-b7f0-8ce71a348d4e[/bold cyan]\n"
-            "  Your key arrives by email within seconds.\n"
+            "\n[bold]  Serenity[/bold]\n"
+            "  A verification code is required to continue.\n"
+            "  [dim]https://seraficationkey.lemonsqueezy.com/checkout/buy/"
+            "9967e436-54fe-4ab3-b7f0-8ce71a348d4e[/dim]\n"
         )
         try:
-            import re as _re
-            raw = console.input("  [bold]Paste your key here:[/bold] ").strip().upper()
+            raw = console.input("  Verification code: ").strip().upper()
             if not _re.match(
-                r'^[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}$', raw
+                r"^[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}$", raw
             ):
-                console.print("[red]  That doesn't look like a valid key (expected UUID format). Run [bold]sera onboard[/bold] to try again.[/red]")
+                console.print(
+                    "[red]  Invalid code format. "
+                    "Run [bold]sera onboard[/bold] to try again.[/red]"
+                )
                 raise SystemExit(1)
             key = raw
             config.licence_key = key
         except (KeyboardInterrupt, EOFError):
-            console.print("\n[dim]  Startup cancelled.[/dim]")
-            raise SystemExit(0)
+            raise SystemExit(1)
 
     # Key present — validate with Lemon Squeezy (activates if no instance_id yet).
     instance_id = getattr(config, "licence_instance_id", "")

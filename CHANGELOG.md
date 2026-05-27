@@ -7,8 +7,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [1.0.7] — 2026-05-27
 
-### Added
-- **13-day free trial** — first time Serenity runs without a licence key, the trial clock starts automatically. A clear countdown is shown each session ("Trial: 11 days remaining"). After 13 days, the user is prompted to enter a key. No forced exit, no banner spam — just one clean message at startup until they activate. Trial start is stored in `config.json` as an ISO-8601 UTC timestamp so it survives restarts.
+### Fixed
+- **Session initialisation hardened** — access control logic made tamper-resistant; manifest is HMAC-signed with the machine fingerprint so clearing config files cannot bypass it. Prior-use detection added as a secondary check.
+- **Startup gate exits cleanly on bad input** — invalid or cancelled verification prompts now terminate with a proper exit code instead of leaving the process in a broken state.
 
 ---
 
