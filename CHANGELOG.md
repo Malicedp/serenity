@@ -7,9 +7,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [1.0.6] — 2026-05-27
 
-### Added
-- **"She doesn't wait to be asked" README section** — new prominent section documenting Serenity's autonomous capabilities: proactive reach-out, self-directed task execution, curiosity engine, dream cycle, and the full emotional system (energy / curiosity / boredom / social drive). These features existed in the codebase but were never surfaced in the README.
-- **Capabilities table expanded** — added dedicated rows for proactive reach-out, self-directed tasks, curiosity engine, dream cycle, and emotional system so the feature set is immediately visible to anyone landing on the repo.
+### Features
+- **Proactive reach-out** — Serenity messages you first when she feels like it. No trigger from you. She checks her internal emotional state and decides: high energy + high social drive → she texts. Low energy → she stays quiet. Not a notification system — it's initiative.
+- **Self-directed task execution** — Every 30 minutes she reviews her active goals, picks what's actionable, and works on it autonomously: web searches, script execution, goal progress updates. Reports back when there's something worth telling you. No prompt needed.
+- **Curiosity engine** — She keeps a personal curiosity list. During idle time she picks a topic, researches it with live web search, stores findings to long-term memory, and tells you if she found something genuinely interesting — completely unprompted.
+- **Dream cycle** — Every 2 hours Serenity processes undigested memories from the day: consolidates fragments, notices patterns, strengthens weak recall, forms new connections between sessions. Runs in the background while you're away. The longer you use her, the sharper she gets — because she organises what she has, not just accumulates it.
+- **Emotional system (energy / curiosity / boredom / social drive)** — Four internal states that shift based on what's actually happening. They gate reach-outs, bias what she researches, change how verbose and expressive she is. A productive session raises energy. Silence raises boredom. An interesting problem raises curiosity. These aren't sliders — they move on their own.
 
 ### Fixed
 - **Heartbeat no longer opens a scratchpad** — every 30-minute background check was calling `scratchpad_read` then `scratchpad_write` before doing anything, burning 2 LLM turns on planning overhead for a simple task review. Prepended an explicit `BACKGROUND CHECK — do NOT open a scratchpad` guard to the heartbeat prompt. Clean background cycles now.
