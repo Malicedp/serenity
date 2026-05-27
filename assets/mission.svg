@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 110" width="860" height="110">
-  <rect width="860" height="110" rx="10" fill="#2a2a2a"/>
+
   <text
     font-family="'Segoe UI', 'SF Pro Display', Arial, sans-serif"
     font-size="15"
-    fill="#FFB6C1"
+    fill="#4A9EFF"
     text-anchor="middle"
     x="430"
     y="30"
@@ -13,7 +13,7 @@
   <text
     font-family="'Segoe UI', 'SF Pro Display', Arial, sans-serif"
     font-size="15"
-    fill="#FFB6C1"
+    fill="#4A9EFF"
     text-anchor="middle"
     x="430"
     y="55"
@@ -23,7 +23,7 @@
   <text
     font-family="'Segoe UI', 'SF Pro Display', Arial, sans-serif"
     font-size="15"
-    fill="#FFB6C1"
+    fill="#4A9EFF"
     text-anchor="middle"
     x="430"
     y="80"
