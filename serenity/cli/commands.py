@@ -1154,8 +1154,16 @@ def gateway(
         session.retain_recent_legal_suffix(hb_cfg.keep_recent_messages)
         agent.sessions.save(session)
 
+        # Prepend a no-scratchpad guard — heartbeat is a background check, not a
+        # user task. The model tends to open a scratchpad for any "decide / plan"
+        # phrasing, which wastes 2 LLM turns and leaves stale scratchpad state.
+        heartbeat_prompt = (
+            "BACKGROUND CHECK — do NOT open or write a scratchpad. "
+            "This is a lightweight background review, not a user task.\n\n"
+            + tasks
+        )
         resp = await agent.process_direct(
-            tasks,
+            heartbeat_prompt,
             session_key="heartbeat",
             channel=channel,
             chat_id=chat_id,
