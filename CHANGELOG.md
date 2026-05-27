@@ -5,6 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.0.6] — 2026-05-27
+
+### Added
+- **"She doesn't wait to be asked" README section** — new prominent section documenting Serenity's autonomous capabilities: proactive reach-out, self-directed task execution, curiosity engine, dream cycle, and the full emotional system (energy / curiosity / boredom / social drive). These features existed in the codebase but were never surfaced in the README.
+- **Capabilities table expanded** — added dedicated rows for proactive reach-out, self-directed tasks, curiosity engine, dream cycle, and emotional system so the feature set is immediately visible to anyone landing on the repo.
+
+### Fixed
+- **Heartbeat no longer opens a scratchpad** — every 30-minute background check was calling `scratchpad_read` then `scratchpad_write` before doing anything, burning 2 LLM turns on planning overhead for a simple task review. Prepended an explicit `BACKGROUND CHECK — do NOT open a scratchpad` guard to the heartbeat prompt. Clean background cycles now.
+
+---
+
 ## [1.0.5] — 2026-05-27
 
 ### Fixed

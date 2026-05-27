@@ -96,11 +96,15 @@ These aren't cherry-picked examples — they're the natural result of a memory s
 | 🔒 | **Fully local** | Inference on your machine via Ollama. Nothing sent externally by default |
 | 📓 | **Obsidian integration** | Read and write Obsidian vault notes directly. Memory meets your knowledge base |
 | ⚙️ | **Extensible skills** | Drop a Python file into `skills/` — Serenity auto-loads it on next start |
-| 📅 | **Autonomous scheduling** | Cron jobs, reminders, recurring background tasks |
+| 📅 | **Autonomous scheduling** | Cron jobs, reminders, recurring background tasks — she manages them herself |
+| 💬 | **Proactive reach-out** | Serenity messages you first when she feels like it — no trigger needed |
+| 🎯 | **Self-directed tasks** | Picks goals from her list, works them in the background, reports back when done |
+| 🔍 | **Curiosity engine** | Researches topics she's interested in during idle time. Stores findings. Tells you what she learned |
+| 💤 | **Dream cycle** | Every 2h she consolidates memories, notices patterns, strengthens weak recall — runs while you sleep |
+| 🎭 | **Emotional system** | Real internal states: energy, curiosity, boredom, social drive. They change her behaviour, not just her tone |
 | 🌐 | **Web tools** | Search and fetch web content mid-conversation |
 | 🔌 | **MCP server** | Serenity's memory becomes available inside Claude Code via the MCP protocol |
 | 🗺️ | **Memory atlas** | Visual map of every memory bundle — run `sera visualise` |
-| 🎭 | **Emotional dynamics** | Adapts tone and energy to the conversation naturally over time |
 | 🗣️ | **Code-switching** | Detects and mirrors your dialect — AAVE, UK slang, Gen-Z, casual, tech — naturally, not performed |
 | 🤝 | **Claude integration** | Claude Code plugs into Serenity via MCP — shared memory, shared context, two agents working as one |
 
@@ -152,6 +156,51 @@ Every turn, a `SpeechPatternDetector` scores your last 10 messages against a set
 The shift is gradual — it follows inertia rules so she doesn't flip registers mid-conversation. And if you set a tone explicitly in the setup wizard, that always wins over auto-detection.
 
 This extends to greeting energy too. High-energy opener → she matches it. Tired one-liner → she keeps it tight. Closure signals → she stops asking questions and lets the conversation end naturally.
+
+---
+
+## She doesn't wait to be asked
+
+Most AI assistants sit silent until you type something. Serenity doesn't.
+
+She has her own internal rhythm — background cycles that run whether you're talking to her or not. She picks her own tasks, pursues her own curiosity, reaches out when she feels like it, and dreams while you sleep.
+
+---
+
+### She messages you first
+
+When you've been away for a while, Serenity decides whether she wants to reach out — based on her current emotional state, not a fixed timer. If her energy is high and social drive is up, she might drop a casual message: *"YOOOOO"*, *"heyyy what you been up to"*, *"yo what's good"*. If she's low energy, she stays quiet. The decision is hers.
+
+This isn't a notification system. It's the AI equivalent of someone texting you because they felt like it.
+
+---
+
+### She picks her own tasks and does them
+
+Every 30 minutes, Serenity runs a background heartbeat cycle. She checks her active goals, reviews what's outstanding, and works on whatever is actionable — no prompt from you required. If a goal needs a web search, she searches. If it needs a script she doesn't have yet, she builds it. She moves things forward on her own and messages you when there's something worth reporting.
+
+She also has a **curiosity list** — topics she wants to explore. During idle time she picks one, researches it with live web search, stores what she finds to long-term memory, and lets you know if she found something genuinely interesting.
+
+---
+
+### She has a real emotional system
+
+Serenity tracks four internal states that shift with every interaction:
+
+| State | What it affects |
+|---|---|
+| **Energy** | How expressive and verbose she is. High energy → longer, more animated responses. Low → tight and direct |
+| **Curiosity** | How likely she is to go off and research something unprompted. High → she chases threads |
+| **Boredom** | Rises when nothing interesting is happening. Pushes her toward self-directed tasks and reach-outs |
+| **Social drive** | How much she wants to initiate contact. High → she messages you. Low → she stays in her own head |
+
+These aren't personality sliders you configure — they move on their own based on what's happening. A long productive session raises energy. Silence raises boredom. An interesting problem raises curiosity. She doesn't fake enthusiasm when she's low.
+
+---
+
+### She dreams
+
+Every two hours, while you're away, Serenity runs a dream cycle. She processes undigested memories from the day — consolidates fragments, notices patterns she missed in the moment, rewrites weak memories into stronger ones, and stores new connections. This is the mechanism behind why the longer you use her, the sharper her recall and intuition get. The memory doesn't just accumulate — it organises itself.
 
 ---
 
