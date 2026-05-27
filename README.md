@@ -33,6 +33,31 @@
 
 ---
 
+## See it in action
+
+<div align="center">
+
+<video src="assets/demo.mp4" controls width="100%"></video>
+
+<br/><br/>
+
+<table>
+<tr>
+<td align="center" width="50%">
+<img src="assets/screenshot1.png" width="100%" alt="Serenity remembering preferences via Telegram"/>
+<br/><sub><b>Remembers what you tell it — favourite colour, interests, anything</b></sub>
+</td>
+<td align="center" width="50%">
+<img src="assets/screenshot2.png" width="100%" alt="Serenity reacts to gaining vision capability"/>
+<br/><sub><b>Gains new capabilities at runtime — here reacting to getting eyes for the first time</b></sub>
+</td>
+</tr>
+</table>
+
+</div>
+
+---
+
 ## What makes Serenity different
 
 Most AI tools are point solutions. One tool for code, another for notes, another for research, another for your calendar. The moment you cross a boundary — code question about a project you've only described in words, a writing task informed by something you read last week — they fall apart because they hold no memory between sessions, between contexts, or between domains.
