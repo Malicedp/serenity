@@ -556,11 +556,51 @@ def _check_licence(config: "Config") -> None:
     key = config.licence_key
 
     if not key:
-        # No key — can happen on first run if the setup wizard didn't collect one.
-        # Prompt interactively rather than hard-exiting so users aren't left stuck.
+        # No key — start or continue the 13-day trial.
+        _TRIAL_DAYS = 13
+        now_utc = datetime.now(tz=timezone.utc)
+
+        if not config.trial_start:
+            # First run without a key — begin the trial clock.
+            config.trial_start = now_utc.isoformat()
+            from serenity.config.paths import get_config_path
+            try:
+                import json as _json
+                _cfg_path = get_config_path()
+                _raw = _json.loads(_cfg_path.read_text(encoding="utf-8"))
+                _raw["trial_start"] = config.trial_start
+                _cfg_path.write_text(_json.dumps(_raw, indent=2), encoding="utf-8")
+            except Exception:
+                pass
+            console.print(
+                f"\n[bold cyan]  ✦ Serenity — 13-day free trial started.[/bold cyan]\n"
+                f"  You have [bold]{_TRIAL_DAYS} days[/bold] to try everything before a key is required.\n"
+                f"  Get your key at any time:\n"
+                f"  [bold cyan]https://seraficationkey.lemonsqueezy.com/checkout/buy/9967e436-54fe-4ab3-b7f0-8ce71a348d4e[/bold cyan]\n"
+            )
+            return
+
+        # Trial already started — check how many days remain.
+        try:
+            trial_began = datetime.fromisoformat(config.trial_start)
+            if trial_began.tzinfo is None:
+                trial_began = trial_began.replace(tzinfo=timezone.utc)
+            days_used = (now_utc - trial_began).days
+            days_left = _TRIAL_DAYS - days_used
+        except (ValueError, TypeError):
+            days_left = 0
+
+        if days_left > 0:
+            console.print(
+                f"  [dim]Trial: [bold]{days_left} day{'s' if days_left != 1 else ''} remaining[/bold] — "
+                f"get your key at seraficationkey.lemonsqueezy.com[/dim]"
+            )
+            return
+
+        # Trial expired — prompt for key.
         console.print(
-            "\n[bold yellow]  No licence key found.[/bold yellow]\n"
-            "  Get your free personal key instantly at:\n"
+            "\n[bold yellow]  Your 13-day trial has ended.[/bold yellow]\n"
+            "  Thanks for trying Serenity — get your key to keep going:\n"
             "  [bold cyan]https://seraficationkey.lemonsqueezy.com/checkout/buy/9967e436-54fe-4ab3-b7f0-8ce71a348d4e[/bold cyan]\n"
             "  Your key arrives by email within seconds.\n"
         )
