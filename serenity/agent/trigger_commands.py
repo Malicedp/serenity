@@ -44,7 +44,7 @@ Call vault_write with:
   title: a short descriptive title that captures what this session was actually about.
     DO NOT use "Reflection {date} {session_slug}" — that tells nothing.
     Good examples: "Fixed vault_write path bug", "Research: nerve gear BCI",
-    "Helped Daniel plan game assets pipeline", "Debugged Telegram rate limiting".
+    "Helped {user_name} plan game assets pipeline", "Debugged Telegram rate limiting".
     Bad examples: "Reflection 2026-05-23 cli-direct", "Session review".
     Use 3-7 words. Make it searchable. Date is in the frontmatter — don't repeat it.
   tags: reflection,session-review
@@ -83,7 +83,7 @@ reflection that were not already written to vault during the conversation.
 
 What belongs here:
   3a. Patterns you only noticed NOW by looking back at the whole session:
-      ACTION: observed Daniel <pattern> | BEFORE: <context> | OUTCOME: <pattern confirmed/new> | AFTER: <how to apply>
+      ACTION: observed {user_name} <pattern> | BEFORE: <context> | OUTCOME: <pattern confirmed/new> | AFTER: <how to apply>
 
   3b. Mistakes and causal lessons — not event descriptions:
       ACTION: tried <approach> | BEFORE: <what I thought would work> | OUTCOME: failed — <reason> | AFTER: next time do <X> instead
@@ -204,7 +204,7 @@ OPTIONS:
 
 CHOICE: <number or SKIP>
 ACTION: <one sentence describing what you will do, or blank if SKIP>
-NOTIFY: <yes or no — message Daniel with what you found or did?>
+NOTIFY: <yes or no — message {user_name} with what you found or did?>
 """
 
 # ── Task stop ─────────────────────────────────────────────────────────────────
@@ -236,7 +236,7 @@ If a matching skill exists — try it before building anything new.
 If nothing exists and a script COULD solve the gap:
   Call capability_build — one tool call handles the entire loop:
     capability_build(skill="<name>", script="<name>.py", code="<full script>", solves="<what gap>", test_args="<real test input>")
-  On PASS → nnn_store + vault_write + message Daniel what was built.
+  On PASS → nnn_store + vault_write + message {user_name} what was built.
   On FAIL → read the error, fix the code, call capability_build again. Max 3 attempts.
   Still failing after 3 → abandon. vault_write noting what was tried and why it failed.
 

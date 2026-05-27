@@ -1713,10 +1713,18 @@ class AgentLoop:
         date_str = datetime.now().strftime("%Y-%m-%d")
         slug = session_key.replace(":", "-").replace("/", "-")[:40]
 
+        try:
+            from serenity.config.loader import load_config as _lc_refl
+            _cfg_refl = _lc_refl()
+            _uname_refl = (_cfg_refl.user.name or "").strip() or "your user"
+        except Exception:
+            _uname_refl = "your user"
+
         command = SESSION_REFLECTION.format(
             activity_log=activity_tail or "(no tool activity recorded this session)",
             date=date_str,
             session_slug=slug,
+            user_name=_uname_refl,
         )
 
         logger.info("Firing session reflection for {}", session_key)
@@ -1936,10 +1944,18 @@ class AgentLoop:
         slug = session_key.replace(":", "-").replace("/", "-")[:40]
         channel, chat_id = (session_key.split(":", 1) + ["direct"])[:2]
 
+        try:
+            from serenity.config.loader import load_config as _lc_stop
+            _cfg_stop = _lc_stop()
+            _uname_stop = (_cfg_stop.user.name or "").strip() or "your user"
+        except Exception:
+            _uname_stop = "your user"
+
         command = TASK_STOP.format(
             failure_count=failure_count,
             date=date_str,
             session_slug=slug,
+            user_name=_uname_stop,
         )
 
         logger.warning(
@@ -2160,6 +2176,13 @@ class AgentLoop:
         except Exception:
             pass
 
+        try:
+            from serenity.config.loader import load_config as _lc_cur
+            _cfg_cur = _lc_cur()
+            _uname_cur = (_cfg_cur.user.name or "").strip() or "your user"
+        except Exception:
+            _uname_cur = "your user"
+
         command = CURIOSITY_LOOP.format(
             energy=energy,
             curiosity=curiosity,
@@ -2168,6 +2191,7 @@ class AgentLoop:
             mood_nudge=mood_nudge,
             curiosity_topics=curiosity_topics,
             active_goals=active_goals,
+            user_name=_uname_cur,
         )
 
         logger.info(

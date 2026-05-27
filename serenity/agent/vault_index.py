@@ -27,7 +27,7 @@ _MIN_SCORE       = 0.35   # cosine similarity floor — below this is noise
 
 # System dirs and filenames never indexed (same list as _search_vault)
 _SKIP_DIRS  = frozenset({"Agent", "memory", "sessions", "cron", "state",
-                          "skills", ".git", ".obsidian", "User", "Daniel"})
+                          "skills", ".git", ".obsidian", "User"})
 _SKIP_FILES = frozenset({"SOUL.md", "AGENTS.md", "HEARTBEAT.md", "TOOLS.md",
                           "USER.md", "MEMORY.md", "SKILLS.md", "BOOTSTRAP.md",
                           "IDENTITY.md", "Experience.md"})

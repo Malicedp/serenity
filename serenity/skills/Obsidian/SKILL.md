@@ -81,8 +81,8 @@ Use `vault_write` — you only need to supply `title`, `content`, and optional `
 
 ```
 vault_write(
-  title="Daniel's favourite colour",
-  content="Daniel's favourite colour is blue.",
+  title="Favourite colour",
+  content="User's favourite colour is blue.",
   tags="preference,user"
 )
 ```

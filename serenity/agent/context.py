@@ -524,7 +524,7 @@ class ContextBuilder:
     )
 
     # Vault sub-paths to search for project logs when coding (in addition to root)
-    _CODE_VAULT_SKIP_SUBDIRS = {"memory", "sessions", "cron", "state", "skills", "User", "Daniel"}
+    _CODE_VAULT_SKIP_SUBDIRS = {"memory", "sessions", "cron", "state", "skills", "User"}
 
     # Minimum number of distinct coding-keyword matches required before gitnexus
     # and project-log recall are injected.  task-journal still injects on any hit.
@@ -635,7 +635,7 @@ class ContextBuilder:
 
         # Subfolders that are system/template — only the vault root has user notes
         _SKIP_SUBDIRS = {"Agent", "memory", "sessions", "cron", "state", "skills",
-                         "User", "Daniel"}  # User/Daniel are legacy template folders
+                         "User"}  # system/template folders — user notes live in vault root
 
         hits: list[tuple[str, str]] = []  # (filename, snippet)
 

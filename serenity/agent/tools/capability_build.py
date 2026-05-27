@@ -77,7 +77,7 @@ class CapabilityBuildTool(Tool):
 
     On PASS — call nnn_store and vault_write to record the new capability.
     On FAIL — read the error, fix the code, call capability_build again.
-    Maximum 3 attempts before abandoning and reporting to Daniel.
+    Maximum 3 attempts before abandoning and reporting to your user.
 
     What you can build:
       - Python scripts that fetch data, parse files, call APIs, process text
@@ -110,7 +110,7 @@ class CapabilityBuildTool(Tool):
             "Provide the skill name, script filename, full Python code, and what it solves. "
             "The tool creates the folder, writes the script and manifest, runs it, "
             "and returns PASS or FAIL. "
-            "On PASS: call nnn_store + vault_write to record it, then message Daniel. "
+            "On PASS: call nnn_store + vault_write to record it, then notify your user. "
             "On FAIL: read the error, fix the code, call capability_build again (max 3 tries). "
             "Always call run_script(action='list') first to check if you already built this."
         )
@@ -293,7 +293,7 @@ class CapabilityBuildTool(Tool):
                 f"  1. nnn_store — ACTION: built script {skill} | BEFORE: could not do {solves} | "
                 f"OUTCOME: can now do it via run_script | AFTER: skill at skills/{skill}/\n"
                 f"  2. vault_write — title: 'Built skill {skill}', content: what it does, path, what gap it fills\n"
-                f"  3. Message Daniel — one short line saying what you built and what it does"
+                f"  3. Notify your user — one short line saying what you built and what it does"
             )
         else:
             error_detail = ""

@@ -6,7 +6,7 @@ a summary that gets archived to the Vault and distilled into NNN.
 
 This gives her genuine state-persistence within a task — she can read back
 exactly where she was, what she predicted, and what actually happened — and
-the archive means Daniel can read every thinking session in Vault Memories.
+the archive means the user can read every thinking session in Vault Memories.
 
 Three tools:
   scratchpad_write(section, content)  — append a plan / prediction / outcome / note
@@ -180,7 +180,7 @@ class ScratchpadReadTool(Tool):
         ),
         task_name=StringSchema(
             "Short name for the archive filename. No spaces — use hyphens. "
-            "Example: 'telegram-reply-daniel' or 'research-quantum'. "
+            "Example: 'telegram-reply' or 'research-quantum'. "
             "Defaults to 'task' if omitted."
         ),
         required=["summary"],
@@ -190,9 +190,9 @@ class ScratchpadCloseTool(Tool):
     """Archive the active scratchpad, store the summary to NNN, and clear for the next task.
 
     Call this when a task is complete (win, loss, or give up).
-    The full scratchpad is saved to Vault Memories/scratch/archive/ so Daniel
-    can read every thinking session. The summary is distilled to NNN so future
-    attempts benefit from this one.
+    The full scratchpad is saved to Vault Memories/scratch/archive/ so the
+    user can read every thinking session. The summary is distilled to NNN so
+    future attempts benefit from this one.
     """
 
     @property

@@ -2,7 +2,7 @@
 
 Serenity watches two sources continuously:
   - screen  : mss screen capture  (what is happening on the computer)
-  - camera  : OpenCV webcam frame (what Daniel is doing / how he looks)
+  - camera  : OpenCV webcam frame (what the user is doing / how they look)
 
 Every 500 ms the background thread grabs a frame from each active source,
 computes a perceptual hash, and only calls MiniCPM-V 4.6 when the frame
