@@ -598,7 +598,7 @@ def _check_licence(config: "Config") -> None:
             vault = base / "vault"
             if vault.exists():
                 try:
-                    return any(vault.iterdir())
+                    return any(vault.glob("*.md"))
                 except Exception:
                     pass
             return False
