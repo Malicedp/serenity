@@ -176,6 +176,7 @@ class ReadFileTool(_FsTool):
             mime = detect_image_mime(raw) or mimetypes.guess_type(path)[0]
             if mime and mime.startswith("image/"):
                 return build_image_content_blocks(raw, mime, str(fp), f"(Image file: {path})")
+            # Keep raw in scope — reused below to avoid reading the file twice
 
             # Read dedup: same path + offset + limit + unchanged mtime → stub
             # Always check for external modifications before dedup
@@ -207,8 +208,7 @@ class ReadFileTool(_FsTool):
                 if entry:
                     entry.can_dedup = False
 
-            # Read the file content after dedup check
-            raw = fp.read_bytes()
+            # Reuse raw bytes already read above — avoids a second disk read
             try:
                 text_content = raw.decode("utf-8")
             except UnicodeDecodeError:

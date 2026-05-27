@@ -48,20 +48,7 @@ from serenity.agent.tools.obs import (
     OBSStartRecordingTool, OBSStopRecordingTool,
     OBSStartStreamingTool, OBSStopStreamingTool, OBSToggleMuteTool,
 )
-from serenity.agent.tools.minecraft import (
-    MinecraftConnectTool, MinecraftDisconnectTool, MinecraftStatusTool,
-    MinecraftChatTool, MinecraftNavigateTool, MinecraftStopTool,
-    MinecraftMineTool, MinecraftAttackTool, MinecraftEquipTool,
-    MinecraftDropTool, MinecraftEatTool, MinecraftCraftTool,
-    MinecraftScanBlocksTool, MinecraftScanEntitiesTool, MinecraftEventsTool,
-    MinecraftPlaceBlockTool, MinecraftOpenContainerTool,
-    MinecraftSleepTool, MinecraftWakeTool,
-    MinecraftActivateItemTool, MinecraftDeactivateItemTool, MinecraftActivateBlockTool,
-    MinecraftSenseTool, MinecraftNavigateWaitTool, MinecraftFightTool,
-    MinecraftTickTool, MinecraftAutoSurviveTool, MinecraftPlanTool,
-    MinecraftGoalSetTool, MinecraftGoalDoneTool, MinecraftGoalGetTool,
-    MinecraftBootTool,
-)
+
 from serenity.agent.tools.task_journal import (
     TaskStartTool, TaskStepTool, TaskDecideTool, TaskCompleteTool,
     TaskStatusTool, TaskCaptureTool, TaskCancelTool, read_active_task,
@@ -639,23 +626,6 @@ class AgentLoop:
         self.tools.register(OpenAppTool(), core=False)
         self.tools.register(CloseAppTool(), core=False)
         self.tools.register(MinimiseAppTool(), core=False)
-        # Minecraft — mineflayer bridge; bridge starts automatically on connect
-        # ── Extended: Minecraft (on-demand) ────────────────────────────────
-        for _mc_cls in (
-            MinecraftConnectTool, MinecraftDisconnectTool, MinecraftStatusTool,
-            MinecraftChatTool, MinecraftNavigateTool, MinecraftStopTool,
-            MinecraftMineTool, MinecraftAttackTool, MinecraftEquipTool,
-            MinecraftDropTool, MinecraftEatTool, MinecraftCraftTool,
-            MinecraftScanBlocksTool, MinecraftScanEntitiesTool, MinecraftEventsTool,
-            MinecraftPlaceBlockTool, MinecraftOpenContainerTool,
-            MinecraftSleepTool, MinecraftWakeTool,
-            MinecraftActivateItemTool, MinecraftDeactivateItemTool, MinecraftActivateBlockTool,
-            MinecraftSenseTool, MinecraftNavigateWaitTool, MinecraftFightTool,
-            MinecraftTickTool, MinecraftAutoSurviveTool, MinecraftPlanTool,
-            MinecraftGoalSetTool, MinecraftGoalDoneTool, MinecraftGoalGetTool,
-            MinecraftBootTool,
-        ):
-            self.tools.register(_mc_cls(), core=False)
 
         # ── Extended: mouse / keyboard (on-demand) ─────────────────────────
         for _mk_cls in (

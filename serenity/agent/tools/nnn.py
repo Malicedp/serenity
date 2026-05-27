@@ -46,7 +46,13 @@ def _get_nnn_fns():
         with _nnn_init_lock:
             # Double-check after acquiring lock — another thread may have initialised first
             if _nnn_query_fn is None:
-                from serenity_nnn import encode, query, rewrite
+                try:
+                    from serenity_nnn import encode, query, rewrite
+                except ImportError as exc:
+                    raise RuntimeError(
+                        "serenity_nnn is not installed. "
+                        "Run: pip install serenity-nnn  (or reinstall via: uv sync)"
+                    ) from exc
                 _nnn_query_fn  = query
                 _nnn_encode_fn = encode
                 _nnn_rewrite_fn = rewrite
