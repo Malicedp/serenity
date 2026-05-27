@@ -5,6 +5,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.0.5] — 2026-05-27
+
+### Fixed
+- **Vault deduplication** — `vault_write` now scans existing notes for ≥60% title word overlap before creating a new file. If a similar note already exists, new content is appended under a dated section instead of creating a near-duplicate. Prevents the same memory being stored as 2–3 separate vault files across sessions.
+- **NNN duplicate entries eliminated** — `SESSION_REFLECTION` Step 3 was re-encoding conversation vault writes that `_auto_nnn_encode_direct` already handled immediately post-turn. Reflection now only stores patterns and lessons that are genuinely novel to the review pass — same fact no longer lands in vector memory 2–3 times per session.
+- **Context window now auto-tunes per model** — removed the hardcoded `contextWindowTokens` override that was bypassing the model-aware auto-detection. Serenity now sets context size based on the loaded model: ≤4b → 20k, ≤9b → 28k, ≤20b → 40k, cloud → 80k. No more OOM on small models, no more cramped context on larger ones.
+
+---
+
 ## [1.0.4] — 2026-05-27
 
 ### Removed
