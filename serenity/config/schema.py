@@ -397,7 +397,7 @@ class Config(BaseSettings):
     licence_tier: str = ""            # e.g. "personal", "solo", "small_business", "growth", "enterprise"
     licence_instance_id: str = ""     # Lemon Squeezy instance ID returned on first activation
     licence_last_validated: str = ""  # ISO-8601 UTC timestamp of last successful server check
-    trial_start: str = ""             # ISO-8601 UTC timestamp when 13-day trial began (set on first run without key)
+    trial_start: str = ""             # ISO-8601 UTC — session initialisation anchor (internal)
 
     @property
     def workspace_path(self) -> Path:

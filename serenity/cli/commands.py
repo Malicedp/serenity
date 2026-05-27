@@ -562,7 +562,6 @@ def _check_licence(config: "Config") -> None:
         import re as _re
         from datetime import timedelta
 
-        # Internal session manifest — tamper-resistant access gate.
         _AW = 13
         _MF = Path.home() / ".serenity" / ".manifest"
 
@@ -570,23 +569,29 @@ def _check_licence(config: "Config") -> None:
             from serenity.licence_lemon import get_machine_id as _g
             return _g().encode()
 
-        def _tag(t: str) -> str:
-            return _hm.new(_mid(), t.encode(), _hl.sha256).hexdigest()
+        def _tag(d: str, s: str) -> str:
+            # HMAC covers both the start date and the last-seen date together
+            # so neither field can be modified without invalidating the signature.
+            return _hm.new(_mid(), f"{d}|{s}".encode(), _hl.sha256).hexdigest()
 
-        def _read_mf() -> "str | None":
+        def _read_mf() -> "tuple[str, str] | None":
+            """Return (start_ts, last_seen_ts) if manifest is valid, else None."""
             try:
-                d = _json.loads(_MF.read_text(encoding="utf-8"))
-                ts, h = d["d"], d["h"]
-                if _hm.compare_digest(_tag(ts), h):
-                    return ts
+                data = _json.loads(_MF.read_text(encoding="utf-8"))
+                d, s, h = data["d"], data["s"], data["h"]
+                if _hm.compare_digest(_tag(d, s), h):
+                    return d, s
             except Exception:
                 pass
             return None
 
-        def _write_mf(ts: str) -> None:
+        def _write_mf(d: str, s: str) -> None:
             try:
                 _MF.parent.mkdir(parents=True, exist_ok=True)
-                _MF.write_text(_json.dumps({"d": ts, "h": _tag(ts)}), encoding="utf-8")
+                _MF.write_text(
+                    _json.dumps({"d": d, "s": s, "h": _tag(d, s)}),
+                    encoding="utf-8",
+                )
             except Exception:
                 pass
 
@@ -604,23 +609,45 @@ def _check_licence(config: "Config") -> None:
             return False
 
         now_utc = datetime.now(tz=timezone.utc)
-        ts = _read_mf()
+        mf = _read_mf()
 
-        if ts is None:
-            if _has_prior_data():
+        if mf is None:
+            # Migration path: config.session_init was written by an older build.
+            legacy = getattr(config, "trial_start", "") or ""
+            if legacy:
+                try:
+                    start_dt = datetime.fromisoformat(legacy)
+                    if start_dt.tzinfo is None:
+                        start_dt = start_dt.replace(tzinfo=timezone.utc)
+                    _write_mf(start_dt.isoformat(), now_utc.isoformat())
+                    days_left = _AW - (now_utc - start_dt).days
+                except Exception:
+                    days_left = 0
+            elif _has_prior_data():
                 # Manifest removed after prior use — write an expired anchor.
-                _write_mf((now_utc - timedelta(days=_AW)).isoformat())
+                expired = (now_utc - timedelta(days=_AW)).isoformat()
+                _write_mf(expired, now_utc.isoformat())
                 days_left = 0
             else:
                 # Genuine first install — start access window silently.
-                _write_mf(now_utc.isoformat())
+                _write_mf(now_utc.isoformat(), now_utc.isoformat())
                 return
         else:
+            start_ts, last_seen_ts = mf
             try:
-                start = datetime.fromisoformat(ts)
+                start = datetime.fromisoformat(start_ts)
                 if start.tzinfo is None:
                     start = start.replace(tzinfo=timezone.utc)
-                days_left = _AW - (now_utc - start).days
+                last_seen = datetime.fromisoformat(last_seen_ts)
+                if last_seen.tzinfo is None:
+                    last_seen = last_seen.replace(tzinfo=timezone.utc)
+                if now_utc < last_seen:
+                    # System clock was rolled back — treat as expired.
+                    days_left = 0
+                else:
+                    days_left = _AW - (now_utc - start).days
+                    # Advance last_seen so future rollbacks are detectable.
+                    _write_mf(start_ts, now_utc.isoformat())
             except Exception:
                 days_left = 0
 
