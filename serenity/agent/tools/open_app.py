@@ -47,12 +47,13 @@ class OpenAppTool(Tool):
     @property
     def description(self) -> str:
         return (
-            "Open any installed application or game by name — 'discord', 'spotify', 'chrome', "
-            "'brawlhalla', 'roblox', 'blender', etc. "
+            "Launch any locally installed application or game on this PC by name. "
+            "Use this tool — NOT web_fetch — whenever the user says 'open', 'launch', 'start', or 'run' "
+            "followed by an app name: 'open steam', 'open discord', 'launch spotify', 'start chrome', etc. "
+            "Supports games and apps: 'discord', 'spotify', 'chrome', 'steam', 'brawlhalla', 'roblox', 'blender', 'obs', etc. "
             "Checks the pre-built app index first (desktop shortcuts, Start Menu, registry). "
             "If an app is missing after trying, tell the user to run: sera apps scan. "
-            "Also accepts an absolute .exe path or a URL/protocol string as the app argument. "
-            "Optional 'args' for command-line arguments or a URL to open."
+            "Also accepts an absolute .exe path or a protocol string as the app argument."
         )
 
     async def execute(self, app: str, args: str | None = None, **kwargs: Any) -> str:
