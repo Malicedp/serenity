@@ -1374,7 +1374,7 @@ def _configure_personality(config: Config) -> None:
     traits_display = "random (assigned on first run)" if p.traits == ["*"] else (', '.join(p.traits) or 'none')
     console.print(f"[green]✓[/green] Traits:    {traits_display}")
     console.print(f"[green]✓[/green] Verbosity: {p.verbosity}")
-    console.print(f"[dim]   Tone: auto-detected from your speech[/dim]")
+    console.print("[dim]   Tone: auto-detected from your speech[/dim]")
     console.print("\n[dim]Save and Exit to apply.[/dim]\n")
     input("Press Enter to return to the menu...")
 

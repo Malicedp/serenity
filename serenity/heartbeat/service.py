@@ -140,6 +140,10 @@ class HeartbeatService:
                 )
             return "skip", ""
 
+        if not response.tool_calls:
+            logger.warning("Heartbeat: should_execute_tools=True but tool_calls is empty — skipping")
+            return "skip", ""
+
         args = response.tool_calls[0].arguments
         return args.get("action", "skip"), args.get("tasks", "")
 

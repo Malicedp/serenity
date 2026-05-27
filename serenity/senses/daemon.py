@@ -390,7 +390,7 @@ def _load_whisper(model_size: str, device: str, compute_type: str):
     return None
 
 
-def _transcribe_array(audio: "np.ndarray", sample_rate: int, model) -> str | None:  # type: ignore
+def _transcribe_array(audio: object, sample_rate: int, model) -> str | None:
     """Transcribe a numpy float32 audio array.
 
     Returns:

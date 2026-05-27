@@ -2133,7 +2133,7 @@ def apps_list(query: str = typer.Argument("", help="Filter by name")):
     from serenity.senses.app_index import all_apps, _INDEX_PATH
     index = all_apps()
     if not index:
-        console.print(f"[yellow]No index found. Run: sera apps scan[/yellow]")
+        console.print("[yellow]No index found. Run: sera apps scan[/yellow]")
         return
     needle = query.lower()
     rows = [(k, v["name"], v["exe"]) for k, v in sorted(index.items())
@@ -2205,7 +2205,7 @@ def _pick_from_list(items: list[str], title: str, allow_custom: bool = True) -> 
         console.print(f"  [cyan]{i}[/cyan]. {item}")
     if allow_custom:
         console.print(f"  [cyan]{len(items) + 1}[/cyan]. Enter manually")
-    console.print(f"  [cyan]0[/cyan]. Cancel")
+    console.print("  [cyan]0[/cyan]. Cancel")
 
     raw = typer.prompt("\nChoose", default="0")
     try:
@@ -2307,7 +2307,7 @@ def model_cmd(
     console.print("[bold]Choose a provider:[/bold]")
     for i, p in enumerate(providers, 1):
         console.print(f"  [cyan]{i}[/cyan]. {p}")
-    console.print(f"  [cyan]0[/cyan]. Cancel")
+    console.print("  [cyan]0[/cyan]. Cancel")
 
     raw = typer.prompt("\nProvider", default="0")
     try:
@@ -2397,7 +2397,7 @@ def factory_reset(
     import shutil
     from pathlib import Path
 
-    console.print(f"\n[bold red]⚠  FACTORY RESET[/bold red]\n")
+    console.print("\n[bold red]⚠  FACTORY RESET[/bold red]\n")
     console.print(
         "This will permanently erase ALL session data, vault notes, NNN memory,\n"
         "emotional state, cron jobs, and any skills you have added.\n"
@@ -2856,7 +2856,7 @@ def help_command():
         console.print()
 
     console.print(
-        f"  [dim]Full flag reference:[/dim]  [#5BC8F5]sera <command> --help[/#5BC8F5]\n"
+        "  [dim]Full flag reference:[/dim]  [#5BC8F5]sera <command> --help[/#5BC8F5]\n"
     )
 
 

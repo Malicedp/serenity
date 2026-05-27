@@ -1085,7 +1085,7 @@ class CartesiaTTSProvider:
                     },
                 )
                 output_path.write_bytes(audio)
-                mode = f"clone({clone_file.name})" if clone_file else f"preset"
+                mode = f"clone({clone_file.name})" if clone_file else "preset"
                 logger.info("Cartesia TTS [{}]: {} chars → {}", mode, len(text), output_path.name)
                 return True
             except Exception as e:

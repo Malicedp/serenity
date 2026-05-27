@@ -82,8 +82,8 @@ class VisionWatchStartTool(Tool):
             svc = get_service()
             if svc.is_running:
                 return (
-                    f"Vision watching is already running. "
-                    f"Tell me 'stop watching' first if you want to change sources."
+                    "Vision watching is already running. "
+                    "Tell me 'stop watching' first if you want to change sources."
                 )
             svc.start(sources=source_list)
             src_label = " + ".join(source_list)

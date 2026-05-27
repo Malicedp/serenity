@@ -2109,8 +2109,14 @@ class AgentLoop:
                 "a quick note. Nothing heavy."
             )
         elif social_drive == "high":
+            try:
+                from serenity.config.loader import load_config as _lc
+                _cfg = _lc()
+                _uname = (_cfg.user.name or "").strip() or "your user"
+            except Exception:
+                _uname = "your user"
             nudge_parts.append(
-                "You're feeling social. If you find something interesting, telling Daniel "
+                f"You're feeling social. If you find something interesting, telling {_uname} "
                 "about it would feel natural right now."
             )
         mood_nudge = " ".join(nudge_parts) if nudge_parts else ""
