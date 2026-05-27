@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 110" width="860" height="110">
+  <rect width="860" height="110" rx="10" fill="#0d0d0d"/>
+  <text
+    font-family="'Segoe UI', 'SF Pro Display', Arial, sans-serif"
+    font-size="15"
+    fill="#FF69B4"
+    text-anchor="middle"
+    x="430"
+    y="30"
+    font-style="italic"
+    letter-spacing="0.3"
+  >Serenity was built to be an extension of one's creativity —</text>
+  <text
+    font-family="'Segoe UI', 'SF Pro Display', Arial, sans-serif"
+    font-size="15"
+    fill="#FF69B4"
+    text-anchor="middle"
+    x="430"
+    y="55"
+    font-style="italic"
+    letter-spacing="0.3"
+  >a tool to figure out things ranging from cures to new technologies to uncharted ground,</text>
+  <text
+    font-family="'Segoe UI', 'SF Pro Display', Arial, sans-serif"
+    font-size="15"
+    fill="#FF69B4"
+    text-anchor="middle"
+    x="430"
+    y="80"
+    font-style="italic"
+    letter-spacing="0.3"
+  >something to push research and human understanding forward.</text>
+</svg>

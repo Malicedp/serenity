@@ -25,6 +25,10 @@
 
 *One agent. Every domain. All your context — always.*
 
+<br/>
+
+<img src="assets/mission.svg" alt="Serenity Mission" width="100%"/>
+
 </div>
 
 ---
