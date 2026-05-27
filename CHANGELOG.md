@@ -5,6 +5,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.0.4] — 2026-05-27
+
+### Removed
+- **Minecraft integration stripped out entirely** — `minecraft.py` (1,387 lines, 28 tool classes) deleted. Serenity is no longer bundled with the mineflayer bridge, all `minecraft_*` tools, and the Node.js bridge process. This makes the agent loop significantly lighter — fewer tools loaded, less RAM overhead, faster startup. Minecraft support may return as an optional skill install in a future release.
+
+### Fixed
+- `open_app` tool description rewritten to explicitly instruct the model to use it — not `web_fetch` — when the user says "open", "launch", "start", or "run" an app. Previously, "open Steam" caused Serenity to fetch `store.steampowered.com` instead of launching Steam locally.
+- `filesystem.py` — file bytes were being read twice per request (once for MIME detection, once for content). Now reuses the first read.
+- `nnn.py` — missing `serenity_nnn` module now raises a clean `RuntimeError` with install instructions instead of a raw `ImportError` inside a thread lock.
+- Resolved all 20 ruff lint errors (`F401`/`F841`) that were blocking CI across 12 files — unused imports and dead variable assignments in `agent/`, `cli/`, `providers/`, `senses/`.
+- `contextWindowTokens` corrected to `16,384` in default config (was reverting to `40,960` after gateway restart).
+
+---
+
 ## [1.0.3] — 2026-05-26
 
 ### Added
