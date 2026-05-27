@@ -11,6 +11,50 @@ from serenity.agent.tools.base import Tool, tool_parameters
 from serenity.agent.tools.schema import StringSchema, tool_parameters_schema
 
 
+def _title_words(title: str) -> set[str]:
+    """Return significant words from a title for overlap comparison."""
+    _STOP = {"a", "an", "the", "and", "or", "of", "in", "on", "at", "to",
+             "for", "with", "after", "before", "about", "from", "by", "is",
+             "was", "this", "that", "my", "i", "session", "note", "log"}
+    return {w.lower() for w in re.findall(r"\w+", title) if w.lower() not in _STOP and len(w) > 2}
+
+
+def _find_similar_note(workspace: Path, title: str) -> Path | None:
+    """Return path of an existing note whose title is ≥60% word-overlapping with title.
+
+    Checks the frontmatter/heading of each .md file in the workspace root.
+    Returns the first match found, or None.
+    """
+    new_words = _title_words(title)
+    if not new_words:
+        return None
+
+    for md in workspace.glob("*.md"):
+        try:
+            first_lines = md.read_text(encoding="utf-8", errors="replace")[:400]
+        except OSError:
+            continue
+        # Pull the H1 heading or the frontmatter title if present
+        existing_title = ""
+        for line in first_lines.splitlines():
+            line = line.strip()
+            if line.startswith("# "):
+                existing_title = line[2:].strip()
+                break
+        if not existing_title:
+            existing_title = md.stem  # fall back to filename
+
+        existing_words = _title_words(existing_title)
+        if not existing_words:
+            continue
+
+        overlap = len(new_words & existing_words) / max(len(new_words), len(existing_words))
+        if overlap >= 0.60:
+            return md
+
+    return None
+
+
 def _slugify(title: str) -> str:
     """Convert a title to a short filename-safe slug.
 
@@ -112,6 +156,34 @@ class VaultWriteTool(Tool):
 
         tag_list = [t.strip() for t in tags.split(",")] if tags else ["memory"]
         tag_yaml = ", ".join(tag_list)
+
+        # ── Deduplication: append to similar existing note rather than create new file ──
+        # Only check in vault root (not subfolders like Agent/) to avoid false matches.
+        _is_reflection = any(t in {"reflection", "session-review", "failure"} for t in tag_list)
+        if not subfolder and not _is_reflection:
+            similar = _find_similar_note(self._workspace, title)
+            if similar and similar != path:
+                # Append new content to the existing note under a dated section
+                try:
+                    existing = similar.read_text(encoding="utf-8")
+                    updated = (
+                        existing.rstrip()
+                        + f"\n\n---\n\n## Update — {today}\n\n{content.strip()}\n"
+                    )
+                    similar.write_text(updated, encoding="utf-8")
+                    # Re-index the updated note
+                    try:
+                        from serenity.agent.vault_index import index_note
+                        index_note(similar, updated)
+                    except Exception:
+                        pass
+                    return (
+                        f"✅ UPDATED existing note `{similar.name}` (similar to '{title}') "
+                        f"— appended {len(content)} chars rather than creating a duplicate."
+                    )
+                except Exception:
+                    pass  # fall through to normal write if append fails
+        # ─────────────────────────────────────────────────────────────────────
 
         note = (
             f"---\n"

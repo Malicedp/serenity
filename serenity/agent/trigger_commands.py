@@ -74,25 +74,32 @@ Call vault_write with:
     [Format: • ACTION: ... | BEFORE: ... | OUTCOME: ... | AFTER: ...]
     [Minimum 1 bullet. Maximum no limit — extract everything worth keeping.]
 
-STEP 3 — Store learnings to NNN. THIS STEP IS MANDATORY. Do not skip it.
+STEP 3 — Store NOVEL learnings to NNN. THIS STEP IS MANDATORY. Do not skip it.
 
-Every session produces at least one learning worth storing. Read the reflection you
-just wrote in Step 2 and extract the learnings. Make multiple nnn_store calls:
+IMPORTANT: Any vault_write you made DURING the conversation (not the reflection note
+in Step 2) was already automatically encoded into NNN. Do NOT re-encode those — it
+creates duplicate entries. Only store things that are NEW insights surfaced by this
+reflection that were not already written to vault during the conversation.
 
-  3a. Task/world learning — what you learned about the task, game, tool, or topic:
-      ACTION: <what was attempted> | BEFORE: <situation> | OUTCOME: <what resulted> | AFTER: <what changed>
+What belongs here:
+  3a. Patterns you only noticed NOW by looking back at the whole session:
+      ACTION: observed Daniel <pattern> | BEFORE: <context> | OUTCOME: <pattern confirmed/new> | AFTER: <how to apply>
 
-  3b. If you noticed patterns about the user (preferences, communication style, habits):
-      ACTION: observed Daniel <behaviour> | BEFORE: <context> | OUTCOME: <pattern confirmed/new> | AFTER: <how to apply this>
-
-  3c. If you made a mistake or hit a failure:
+  3b. Mistakes and causal lessons — not event descriptions:
       ACTION: tried <approach> | BEFORE: <what I thought would work> | OUTCOME: failed — <reason> | AFTER: next time do <X> instead
+
+  3c. A single session-level summary if the session covered important new ground:
+      ACTION: completed session — <topic> | BEFORE: <starting state> | OUTCOME: <result> | AFTER: <what changed>
+
+What does NOT belong here (already encoded from conversation vault_writes):
+  - Facts about the user you vault_write'd during the conversation
+  - Tool outputs or research results already saved to vault this session
+  - Anything you explicitly remembered mid-conversation
 
 Use session_id: {session_slug} on all nnn_store calls.
 
-If you genuinely did nothing this session (no tools called, no task attempted, no user
-interaction beyond a single greeting) — then and only then skip this step.
-Otherwise: store. Even "I learned the user prefers X" is worth one nnn_store call.
+If you genuinely did nothing this session — then and only then skip this step.
+Otherwise: store at least one reflection-unique learning.
 
 STEP 4 — Close the scratchpad (if one was found in Step 1).
 Call scratchpad_close with:
