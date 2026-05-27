@@ -299,6 +299,7 @@ Your key arrives by email within seconds from Lemon Squeezy.
 ```bash
 git clone https://github.com/Malicedp/serenity.git
 cd serenity
+pip install wheel
 ```
 
 **Windows:**
