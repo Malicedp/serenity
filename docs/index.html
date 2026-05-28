@@ -651,175 +651,146 @@
 </footer>
 
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script>
 (function () {
   const canvas = document.getElementById('neuro-canvas');
-  if (!canvas || !window.THREE) return;
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
 
-  /* ── Renderer ── */
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(0x000000, 0);
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 600);
-  camera.position.set(0, 0, 130);
-
+  let W = 0, H = 0;
   function resize() {
     const hero = canvas.parentElement;
-    const w = hero.offsetWidth || window.innerWidth;
-    const h = hero.offsetHeight || window.innerHeight;
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
+    W = canvas.width  = hero.offsetWidth  || window.innerWidth;
+    H = canvas.height = hero.offsetHeight || window.innerHeight;
   }
   resize();
   window.addEventListener('resize', resize);
 
   /* ── Palette ── */
-  const PAL = [
-    new THREE.Color(0xff5faa), // pink
-    new THREE.Color(0x00e5ff), // cyan
-    new THREE.Color(0x76ff50), // green
-    new THREE.Color(0xffd700), // yellow
-    new THREE.Color(0xff7200), // orange
-    new THREE.Color(0xa259ff), // purple
-    new THREE.Color(0xff3c6e), // red-pink
-    new THREE.Color(0x00ffaa), // teal
-  ];
+  const PAL = ['#ff5faa','#00e5ff','#76ff50','#ffd700','#ff7200','#a259ff','#ff3c6e','#00ffaa'];
+
+  /* ── 3-D projection (manual) ── */
+  let rotY = 0, rotX = 0;
+  function project(x, y, z) {
+    const cy = Math.cos(rotY), sy = Math.sin(rotY);
+    const x1 = x * cy - z * sy, z1 = x * sy + z * cy;
+    const cx = Math.cos(rotX), sx = Math.sin(rotX);
+    const y2 = y * cx - z1 * sx, z2 = y * sx + z1 * cx;
+    const fov = 300, s = fov / (fov + z2 + 180);
+    return { px: x1 * s + W / 2, py: y2 * s + H / 2, s };
+  }
 
   /* ── Branch generation ── */
-  function branch(origin, dir, len, depth, maxDepth, out) {
-    if (depth > maxDepth || len < 0.4) return;
-    const end = origin.clone().addScaledVector(dir, len);
-    out.push([origin.clone(), end.clone()]);
-    if (depth < maxDepth) {
-      const kids = depth === 0 ? 3 + Math.floor(Math.random() * 3) : 2 + Math.floor(Math.random() * 2);
+  function genBranches(ox, oy, oz, dx, dy, dz, len, depth, maxD, out) {
+    if (depth > maxD || len < 0.5) return;
+    const ex = ox + dx * len, ey = oy + dy * len, ez = oz + dz * len;
+    out.push({ sx: ox, sy: oy, sz: oz, ex, ey, ez });
+    if (depth < maxD) {
+      const kids = depth === 0 ? 3 + (Math.random() * 3 | 0) : 2 + (Math.random() * 2 | 0);
       for (let i = 0; i < kids; i++) {
-        const spread = (0.35 + Math.random() * 0.55) * (1 - depth / maxDepth * 0.6);
-        const ax = new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).normalize();
-        const childDir = dir.clone().applyAxisAngle(ax, spread * Math.PI).normalize();
-        branch(end.clone(), childDir, len * (0.52 + Math.random() * 0.22), depth + 1, maxDepth, out);
+        const spread = 0.38 + Math.random() * 0.52;
+        let px = Math.random()-0.5, py = Math.random()-0.5, pz = Math.random()-0.5;
+        const dot = dx*px + dy*py + dz*pz;
+        px -= dot*dx; py -= dot*dy; pz -= dot*dz;
+        const pl = Math.sqrt(px*px+py*py+pz*pz)||1;
+        let cdx = dx + (px/pl)*spread, cdy = dy + (py/pl)*spread, cdz = dz + (pz/pl)*spread;
+        const cl = Math.sqrt(cdx*cdx+cdy*cdy+cdz*cdz)||1;
+        genBranches(ex, ey, ez, cdx/cl, cdy/cl, cdz/cl, len*(0.52+Math.random()*0.22), depth+1, maxD, out);
       }
     }
   }
 
   /* ── Build neurons ── */
   const neurons = [];
-  const N = 16;
+  for (let i = 0; i < 15; i++) {
+    const angle = (i / 15) * Math.PI * 2;
+    const r  = 14 + Math.random() * 30;
+    const cx = Math.cos(angle) * r + (Math.random()-.5) * 16;
+    const cy = (Math.random()-.5) * 52;
+    const cz = Math.sin(angle) * r * 0.6 + (Math.random()-.5) * 16;
+    const color = PAL[i % PAL.length];
+    const scale = 0.65 + Math.random() * 0.65;
+    const branches = [];
+    for (let a = 0; a < 4 + (Math.random()*4|0); a++) {
+      let dx=Math.random()-.5, dy=Math.random()-.5, dz=Math.random()-.5;
+      const dl=Math.sqrt(dx*dx+dy*dy+dz*dz)||1;
+      genBranches(cx,cy,cz, dx/dl,dy/dl,dz/dl, scale*(7+Math.random()*7), 0, 3, branches);
+    }
+    neurons.push({ cx, cy, cz, color, branches, phase: Math.random()*Math.PI*2 });
+  }
 
-  for (let i = 0; i < N; i++) {
-    const angle  = (i / N) * Math.PI * 2;
-    const radius = 12 + Math.random() * 32;
-    const cx = Math.cos(angle) * radius + (Math.random() - 0.5) * 18;
-    const cy = (Math.random() - 0.5) * 55;
-    const cz = Math.sin(angle) * radius * 0.55 + (Math.random() - 0.5) * 18;
-    const col = PAL[i % PAL.length].clone();
-    const scale = 0.65 + Math.random() * 0.7;
+  /* ── Signals ── */
+  const signals = [];
+  function spawnSignal() {
+    if (signals.length >= 45) return;
+    const n = neurons[Math.random()*neurons.length|0];
+    if (!n.branches.length) return;
+    const b = n.branches[Math.random()*n.branches.length|0];
+    signals.push({ n, b, t: 0, speed: 0.007 + Math.random()*0.014 });
+  }
+  for (let i = 0; i < 32; i++) spawnSignal();
+
+  /* ── Draw helpers ── */
+  function line3D(sx, sy, sz, ex, ey, ez, color, alpha) {
+    const a = project(sx,sy,sz), b = project(ex,ey,ez);
+    const bright = (a.s + b.s) * 0.5;
+    ctx.globalAlpha = alpha * bright;
+    ctx.strokeStyle = color;
+    ctx.shadowColor  = color;
+    ctx.shadowBlur   = 7;
+    ctx.lineWidth    = 2.5 * bright;
+    ctx.beginPath(); ctx.moveTo(a.px,a.py); ctx.lineTo(b.px,b.py); ctx.stroke();
+    ctx.lineWidth    = 0.7 * bright;
+    ctx.globalAlpha  = Math.min(1, alpha * bright * 1.6);
+    ctx.beginPath(); ctx.moveTo(a.px,a.py); ctx.lineTo(b.px,b.py); ctx.stroke();
+    ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+  }
+
+  function dot3D(x, y, z, r, color, alpha, glow) {
+    const p = project(x,y,z);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle   = color;
+    ctx.shadowColor = color;
+    ctx.shadowBlur  = glow;
+    ctx.beginPath(); ctx.arc(p.px, p.py, r * p.s, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+  }
+
+  /* ── Render loop ── */
+  let t = 0;
+  function draw() {
+    requestAnimationFrame(draw);
+    t += 0.004;
+    rotY = t * 0.24;
+    rotX = Math.sin(t * 0.16) * 0.22;
+
+    ctx.clearRect(0, 0, W, H);
 
     /* branches */
-    const paths = [];
-    const mainArms = 4 + Math.floor(Math.random() * 4);
-    for (let a = 0; a < mainArms; a++) {
-      const dir = new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).normalize();
-      branch(new THREE.Vector3(cx, cy, cz), dir, scale * (7 + Math.random() * 7), 0, 3, paths);
-    }
-
-    /* line geometry */
-    const pos = [];
-    paths.forEach(([s, e]) => { pos.push(s.x,s.y,s.z, e.x,e.y,e.z); });
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    const mat = new THREE.LineBasicMaterial({
-      color: col, transparent: true, opacity: 0.55,
-      blending: THREE.AdditiveBlending, depthWrite: false,
+    neurons.forEach(n => {
+      n.branches.forEach(b => line3D(b.sx,b.sy,b.sz, b.ex,b.ey,b.ez, n.color, 0.42));
     });
-    scene.add(new THREE.LineSegments(geo, mat));
 
-    /* soma glow (two spheres: solid core + soft halo) */
-    const somaCore = new THREE.Mesh(
-      new THREE.SphereGeometry(0.7, 8, 8),
-      new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 1,
-        blending: THREE.AdditiveBlending, depthWrite: false })
-    );
-    somaCore.position.set(cx, cy, cz);
-    scene.add(somaCore);
+    /* soma */
+    neurons.forEach(n => {
+      n.phase += 0.025;
+      dot3D(n.cx,n.cy,n.cz, 5, n.color, 0.07+Math.abs(Math.sin(n.phase))*0.1, 20);
+      dot3D(n.cx,n.cy,n.cz, 1.1, n.color, 0.95, 14);
+    });
 
-    const somaHalo = new THREE.Mesh(
-      new THREE.SphereGeometry(3, 8, 8),
-      new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.08,
-        blending: THREE.AdditiveBlending, depthWrite: false })
-    );
-    somaHalo.position.set(cx, cy, cz);
-    scene.add(somaHalo);
-
-    neurons.push({ cx, cy, cz, col, paths, somaHalo });
-  }
-
-  /* ── Signals (travelling dots along branches) ── */
-  const MAX_SIGNALS = 40;
-  const signals = [];
-
-  function spawnSignal() {
-    if (signals.length >= MAX_SIGNALS) return;
-    const n = neurons[Math.floor(Math.random() * neurons.length)];
-    if (!n.paths.length) return;
-    const path = n.paths[Math.floor(Math.random() * n.paths.length)];
-
-    const mesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.35, 6, 6),
-      new THREE.MeshBasicMaterial({
-        color: n.col, transparent: true, opacity: 1,
-        blending: THREE.AdditiveBlending, depthWrite: false,
-      })
-    );
-    scene.add(mesh);
-    signals.push({ mesh, path, progress: 0, speed: 0.007 + Math.random() * 0.013 });
-  }
-
-  /* seed signals */
-  for (let i = 0; i < 25; i++) spawnSignal();
-
-  /* ── Animation loop ── */
-  let t = 0;
-  const tmp = new THREE.Vector3();
-
-  function animate() {
-    requestAnimationFrame(animate);
-    t += 0.004;
-
-    /* slow camera orbit */
-    camera.position.x = Math.sin(t * 0.28) * 130;
-    camera.position.y = Math.sin(t * 0.19) * 28;
-    camera.position.z = Math.cos(t * 0.28) * 130;
-    camera.lookAt(0, 0, 0);
-
-    /* update signals */
-    for (let i = signals.length - 1; i >= 0; i--) {
+    /* signals */
+    for (let i = signals.length-1; i >= 0; i--) {
       const s = signals[i];
-      s.progress += s.speed;
-      if (s.progress >= 1) {
-        scene.remove(s.mesh);
-        s.mesh.geometry.dispose();
-        s.mesh.material.dispose();
-        signals.splice(i, 1);
-        spawnSignal();
-      } else {
-        tmp.lerpVectors(s.path[0], s.path[1], s.progress);
-        s.mesh.position.copy(tmp);
-      }
+      s.t += s.speed;
+      if (s.t >= 1) { signals.splice(i,1); spawnSignal(); continue; }
+      const x = s.b.sx + (s.b.ex-s.b.sx)*s.t;
+      const y = s.b.sy + (s.b.ey-s.b.sy)*s.t;
+      const z = s.b.sz + (s.b.ez-s.b.sz)*s.t;
+      dot3D(x, y, z, 1.3, s.n.color, 1, 12);
     }
-
-    /* pulse soma halos */
-    neurons.forEach((n, idx) => {
-      n.somaHalo.material.opacity = 0.06 + Math.abs(Math.sin(t * 1.8 + idx * 0.9)) * 0.14;
-    });
-
-    renderer.render(scene, camera);
+    while (signals.length < 30) spawnSignal();
   }
-
-  animate();
+  draw();
 })();
 </script>
 
