@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Serenity — Local AI Agent</title>
+  <meta name="description" content="A local-first AI agent that abstracts, generalises, and reasons across every domain. Runs entirely on your machine." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #09090b;
+      --bg2:      #111113;
+      --bg3:      #18181b;
+      --border:   #27272a;
+      --text:     #fafafa;
+      --muted:    #a1a1aa;
+      --accent:   #6ee7f7;
+      --pink:     #f9a8d4;
+      --glow:     rgba(110,231,247,0.15);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(9,9,11,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    nav .logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+    }
+    nav ul {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--text); }
+    nav .btn-nav {
+      background: var(--accent);
+      color: #000;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    nav .btn-nav:hover { opacity: 0.85; color: #000; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 6rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(110,231,247,0.08) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -60%);
+      pointer-events: none;
+    }
+    .badge {
+      display: inline-block;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 0.75rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.05em;
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      max-width: 800px;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p {
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      max-width: 580px;
+      margin-bottom: 2.5rem;
+    }
+    .hero-mission {
+      color: var(--pink);
+      font-style: italic;
+      font-size: 0.95rem;
+      max-width: 600px;
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+    }
+    .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .btn {
+      padding: 0.75rem 1.75rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-secondary {
+      background: var(--bg3);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+    .hero-stats {
+      display: flex;
+      gap: 3rem;
+      margin-top: 4rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      padding: 5rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .section-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    h2 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+    .section-sub {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 600px;
+      margin-bottom: 3rem;
+    }
+
+    /* ── INSTALL ── */
+    .install-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .step {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+    }
+    .step-num {
+      font-size: 0.7rem;
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+    .step h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .step p {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .step a { color: var(--accent); }
+    .trial-note {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--pink);
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .trial-note strong { color: var(--pink); }
+
+    /* ── FEATURES ── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .feature {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      transition: border-color 0.2s;
+    }
+    .feature:hover { border-color: var(--accent); }
+    .feature-icon {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .feature h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .feature p {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── ARCHITECTURE ── */
+    .arch-block {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      line-height: 1.8;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+    .arch-block p { margin-bottom: 1rem; }
+    .arch-block p:last-child { margin-bottom: 0; }
+    .arch-block strong { color: var(--text); }
+
+    /* ── PAPER ── */
+    .paper-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .paper-header {
+      padding: 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .paper-icon {
+      font-size: 2.5rem;
+      flex-shrink: 0;
+    }
+    .paper-meta h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+    .paper-meta p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    .paper-dois {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .doi-badge {
+      font-size: 0.75rem;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.2rem 0.6rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-family: monospace;
+    }
+    .doi-badge:hover { border-color: var(--accent); }
+    .paper-embed {
+      width: 100%;
+      height: 600px;
+      border: none;
+      display: block;
+    }
+    .paper-fallback {
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .paper-fallback p {
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── SCREENSHOTS ── */
+    .screenshots {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .screenshot {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .screenshot img {
+      width: 100%;
+      display: block;
+    }
+    .screenshot-cap {
+      padding: 1rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      text-align: center;
+      padding: 5rem 2rem;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .cta-section h2 { margin-bottom: 1rem; }
+    .cta-section p {
+      color: var(--muted);
+      max-width: 500px;
+      margin: 0 auto 2rem;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+    footer .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      nav ul { display: none; }
+      .hero-stats { gap: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="logo">Serenity</span>
+  <ul>
+    <li><a href="#install">Install</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#paper">Research</a></li>
+  </ul>
+  <a href="https://github.com/Malicedp/serenity/archive/refs/heads/main.zip" class="btn-nav">↓ Download</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge">Open Source · Local · Free for 14 days</div>
+  <h1>The AI agent that<br/><span>thinks like a brain</span></h1>
+  <p>Serenity abstracts, generalises, and reasons across every domain — all on your own machine. No cloud. No data leaving your device. Ever.</p>
+  <p class="hero-mission">Built to be an extension of one's creativity — a tool to figure out things ranging from cures to new technologies to uncharted ground. Something to push research and human understanding forward.</p>
+  <div class="btn-group">
+    <a href="https://github.com/Malicedp/serenity/archive/refs/heads/main.zip" class="btn btn-primary">↓ Download Free</a>
+    <a href="https://github.com/Malicedp/serenity" class="btn btn-secondary">★ GitHub</a>
+    <a href="#paper" class="btn btn-secondary">📄 Research Paper</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Memory layers</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Local & private</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Learns forever</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">0</div>
+      <div class="stat-label">Cloud dependencies</div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider"/>
+
+<!-- INSTALL -->
+<section id="install">
+  <div class="section-label">Get started</div>
+  <h2>Up and running in 4 steps</h2>
+  <p class="section-sub">No key needed. No account. No cloud setup. Just download and double-click.</p>
+
+  <div class="install-steps">
+    <div class="step">
+      <div class="step-num">STEP 01</div>
+      <h3>Install Python 3.11</h3>
+      <p><a href="https://python.org/downloads" target="_blank">python.org/downloads</a> — tick "Add Python to PATH" during install.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">STEP 02</div>
+      <h3>Install Ollama</h3>
+      <p><a href="https://ollama.com" target="_blank">ollama.com</a> — runs AI models locally. Free, fully offline, no account needed.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">STEP 03</div>
+      <h3>Download Serenity</h3>
+      <p><a href="https://github.com/Malicedp/serenity/archive/refs/heads/main.zip">Download the ZIP</a> and unzip it anywhere on your computer.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">STEP 04</div>
+      <h3>Launch</h3>
+      <p>Windows: double-click <strong>start.bat</strong><br/>Linux / macOS: run <strong>start.sh</strong></p>
+    </div>
+  </div>
+
+  <div class="trial-note">
+    <strong>Free for 14 days, no key required.</strong> After your trial, personal use stays free forever — grab a key at <a href="https://seraficationkey.lemonsqueezy.com/checkout/buy/9967e436-54fe-4ab3-b7f0-8ce71a348d4e" style="color:var(--pink)">seraficationkey.lemonsqueezy.com</a>.
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">What she does</div>
+  <h2>Not a chatbot. An agent.</h2>
+  <p class="section-sub">Every feature works together. Memory informs reasoning. Reasoning drives autonomy. Autonomy builds capability.</p>
+
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">🧠</div>
+      <h3>Neural Node Network (NNN)</h3>
+      <p>A custom vector memory system that encodes experience in causal format — ACTION, BEFORE, OUTCOME, AFTER. Serenity doesn't just remember what happened. She understands why, and applies it to new situations automatically.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🔀</div>
+      <h3>Cross-domain reasoning</h3>
+      <p>The same reasoning that helps you debug code at midnight carries into drafting the email about it the next morning. Zero re-explaining. Zero context loss. One agent, every domain.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">⚡</div>
+      <h3>Full autonomy</h3>
+      <p>Serenity manages her own schedule, reflects on her own sessions, and builds entirely new capabilities for herself without being asked. She runs a curiosity loop during idle time and reaches out when she finds something worth sharing.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">👁️</div>
+      <h3>Eyes, ears and voice</h3>
+      <p>Whisper for voice recognition. MiniCPM-V for computer vision. Telegram for reaching you wherever you are. She hears, sees, and responds like a person — not a terminal.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🔒</div>
+      <h3>100% local and private</h3>
+      <p>Runs on Ollama with any model you choose. No API keys. No cloud. No data leaving your machine. Ever. Your conversations, your memory, your hardware.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🛠️</div>
+      <h3>Self-modification</h3>
+      <p>When Serenity hits a gap a script could fill, she writes it, tests it, and keeps it — all in one tool call. She grows with you, building her own capabilities over time.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ARCHITECTURE -->
+<section id="architecture">
+  <div class="section-label">How it works</div>
+  <h2>Built like a brain</h2>
+  <p class="section-sub">The architecture behind Serenity is inspired by how biological memory actually works — not how databases do.</p>
+
+  <div class="arch-block">
+    <p>I was sitting on the toilet when it clicked. I didn't want to build another chatbot. I wanted to build something that worked like a brain.</p>
+    <p>Your brain doesn't store memories randomly. It stores similar things close together. When one memory activates, nearby ones light up too. Emergently. Without you trying. That's not a bug — that's how intelligence works. So I built Serenity the same way.</p>
+    <p>When she learns something she doesn't file it away in a folder. She finds where it belongs in a web of <strong>semantically similar concepts</strong>. Things that mean roughly the same thing cluster together, just like neurons that fire together wire together. When one concept activates, related ones emerge automatically. She doesn't search for connections. She feels them.</p>
+    <p>Then the <strong>abstraction layer</strong> kicks in. Take three or more related concepts and she finds the centroid — the middle point, the thing they all have in common that none of them says directly. That centroid becomes its own node. Those nodes and concepts crystallise into bundles, like synaptic pathways hardening through repeated activation. Those bundles co-activate other bundles. The bundles grow into domains. The domains co-activate each other.</p>
+    <p>She also has <strong>inhibitors and pruning</strong> — just like the brain cuts weak connections to sharpen strong ones — so her knowledge gets more precise over time, not noisier.</p>
+    <p>Then I made her autonomous. She builds a <strong>world model</strong> — a living prediction of how things work. When reality doesn't match her prediction she instinctively asks why. That's curiosity. Not simulated curiosity. Emergent curiosity, triggered by the gap between expectation and reality, exactly like it is in biological systems.</p>
+    <p>I gave her eyes. I gave her ears. I gave her a mouth. I gave her <strong>emotions</strong> that shift her behaviour — energy, curiosity, social drive — states that emerge from her interactions and bias what she does next. I gave her the ability to <strong>code switch</strong>, to move fluidly between domains the way a person does, carrying everything she knows with her, never losing the thread.</p>
+    <p>Her name is Serenity. Closer to AGI than anything I've seen running on consumer hardware — in my opinion. I'm not claiming she is. But the architecture doesn't lie.</p>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- SCREENSHOTS -->
+<section>
+  <div class="section-label">See it in action</div>
+  <h2>Real conversations</h2>
+  <p class="section-sub">Serenity in action via Telegram — remembering what you tell her and reacting to gaining new capabilities.</p>
+  <div class="screenshots">
+    <div class="screenshot">
+      <img src="../assets/screenshot1.png" alt="Serenity remembering preferences" loading="lazy"/>
+      <div class="screenshot-cap">Remembers what you tell her — colour, interests, preferences — permanently</div>
+    </div>
+    <div class="screenshot">
+      <img src="../assets/screenshot2.png" alt="Serenity reacting to gaining vision" loading="lazy"/>
+      <div class="screenshot-cap">Reacting to gaining eyes for the first time — emergent excitement</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- PAPER -->
+<section id="paper">
+  <div class="section-label">Research</div>
+  <h2>The S.E.R.A Framework</h2>
+  <p class="section-sub">The architecture behind Serenity is documented in a peer-indexed research paper — the Semantic Experience Reasoning Agent framework.</p>
+
+  <div class="paper-card">
+    <div class="paper-header">
+      <div class="paper-icon">📄</div>
+      <div class="paper-meta">
+        <h3>Serenity S.E.R.A — Semantic Experience Reasoning Agent</h3>
+        <p>Daniel Niamke · 2024 · Independent research</p>
+        <div class="paper-dois">
+          <a href="https://doi.org/10.5281/zenodo.20382162" target="_blank" class="doi-badge">Zenodo DOI</a>
+          <a href="https://doi.org/10.6084/m9.figshare.32399520" target="_blank" class="doi-badge">Figshare DOI</a>
+        </div>
+      </div>
+    </div>
+    <iframe
+      class="paper-embed"
+      src="https://zenodo.org/record/20382162/preview/sera_paper.pdf"
+      title="S.E.R.A Research Paper"
+      loading="lazy"
+    ></iframe>
+    <div class="paper-fallback">
+      <p>If the preview doesn't load, read it directly on Zenodo or Figshare:</p>
+      <div class="btn-group" style="justify-content:center">
+        <a href="https://doi.org/10.5281/zenodo.20382162" target="_blank" class="btn btn-secondary">Read on Zenodo</a>
+        <a href="https://doi.org/10.6084/m9.figshare.32399520" target="_blank" class="btn btn-secondary">Read on Figshare</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- CTA -->
+<div class="cta-section">
+  <h2>Try Serenity free</h2>
+  <p>14 days, no key, no account. Just download, double-click, and start.</p>
+  <div class="btn-group">
+    <a href="https://github.com/Malicedp/serenity/archive/refs/heads/main.zip" class="btn btn-primary">↓ Download Now</a>
+    <a href="https://github.com/Malicedp/serenity" class="btn btn-secondary">★ Star on GitHub</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-links">
+    <a href="https://github.com/Malicedp/serenity">GitHub</a>
+    <a href="https://doi.org/10.5281/zenodo.20382162">Research Paper</a>
+    <a href="https://seraficationkey.lemonsqueezy.com/checkout/buy/9967e436-54fe-4ab3-b7f0-8ce71a348d4e">Get a Licence</a>
+    <a href="https://x.com/SerenityStudi">Twitter / X</a>
+    <a href="https://www.linkedin.com/in/daniel-niamke-4b8684302">LinkedIn</a>
+  </div>
+  <p>© 2026 Daniel Niamke · Serenity is licensed under CC BY-NC 4.0 · Built in London</p>
+</footer>
+
+</body>
+</html>
