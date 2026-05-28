@@ -33,6 +33,60 @@
 
 ---
 
+## Getting started
+
+**No key needed to get started — Serenity runs free for 14 days out of the box.**
+
+### Step 1 — Install Python 3.11
+
+**[→ Download Python 3.11](https://python.org/downloads)**
+
+During install tick **"Add Python to PATH"** — this is required.
+
+### Step 2 — Install Ollama
+
+**[→ Download Ollama](https://ollama.com)**
+
+Serenity uses Ollama to run AI models locally. Free, fully offline, no account needed.
+
+### Step 3 — Download Serenity
+
+**[→ Download the ZIP](https://github.com/Malicedp/serenity/archive/refs/heads/main.zip)**
+
+Unzip it anywhere on your computer.
+
+### Step 4 — Launch
+
+Open the unzipped folder and double-click:
+
+**Windows:** `start.bat`
+
+**Linux / macOS:** `start.sh`
+
+That's it. Serenity installs everything it needs, walks you through a quick setup, and starts. Every launch after that is a single double-click.
+
+---
+
+> **Want a licence key after your trial?** Grab one instantly at [seraficationkey.lemonsqueezy.com](https://seraficationkey.lemonsqueezy.com/checkout/buy/9967e436-54fe-4ab3-b7f0-8ce71a348d4e) — personal use is free forever.
+
+---
+
+### Requirements
+
+| | Minimum | Recommended |
+|---|---|---|
+| **OS** | Windows 10, Ubuntu 20.04, macOS 12 | Windows 11 |
+| **Python** | 3.11 | 3.11 |
+| **RAM** | 6 GB | 16 GB+ |
+| **Storage** | 10 GB | 20 GB+ (model files) |
+| **GPU** | Optional | Any — accelerates responses |
+
+### Optional but recommended
+
+**[Obsidian](https://obsidian.md)** — if you use Obsidian, Serenity reads and writes directly to your vault and becomes its reasoning layer. If not, she creates her own vault automatically.
+
+---
+
 ## See it in action
 
 <div align="center">
@@ -259,60 +313,6 @@ Response written back to NNN as new memory
 ```
 
 Memory compounds. The longer you use Serenity, the more precise and personal she becomes. This is not RAG bolted onto a chatbot — NNN is the agent's primary state.
-
----
-
-## Getting started
-
-**No key needed to get started — Serenity runs free for 14 days out of the box.**
-
-### Step 1 — Install Python 3.11
-
-**[→ Download Python 3.11](https://python.org/downloads)**
-
-During install tick **"Add Python to PATH"** — this is required.
-
-### Step 2 — Install Ollama
-
-**[→ Download Ollama](https://ollama.com)**
-
-Serenity uses Ollama to run AI models locally. Free, fully offline, no account needed.
-
-### Step 3 — Download Serenity
-
-**[→ Download the ZIP](https://github.com/Malicedp/serenity/archive/refs/heads/main.zip)**
-
-Unzip it anywhere on your computer.
-
-### Step 4 — Launch
-
-Open the unzipped folder and double-click:
-
-**Windows:** `start.bat`
-
-**Linux / macOS:** `start.sh`
-
-That's it. Serenity installs everything it needs, walks you through a quick setup, and starts. Every launch after that is a single double-click.
-
----
-
-> **Want a licence key after your trial?** Grab one instantly at [seraficationkey.lemonsqueezy.com](https://seraficationkey.lemonsqueezy.com/checkout/buy/9967e436-54fe-4ab3-b7f0-8ce71a348d4e) — personal use is free forever.
-
----
-
-### Requirements
-
-| | Minimum | Recommended |
-|---|---|---|
-| **OS** | Windows 10, Ubuntu 20.04, macOS 12 | Windows 11 |
-| **Python** | 3.11 | 3.11 |
-| **RAM** | 6 GB | 16 GB+ |
-| **Storage** | 10 GB | 20 GB+ (model files) |
-| **GPU** | Optional | Any — accelerates responses |
-
-### Optional but recommended
-
-**[Obsidian](https://obsidian.md)** — if you use Obsidian, Serenity reads and writes directly to your vault and becomes its reasoning layer. If not, she creates her own vault automatically.
 
 ---
 
