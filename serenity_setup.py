@@ -330,6 +330,55 @@ def run_wizard() -> None:
         console.print(f"\n[{MU}]You must accept the terms to use Serenity. Setup cancelled.[/{MU}]\n")
         sys.exit(0)
 
+    # ── Use-case question ─────────────────────────────────────────────────────
+    step_label("How will you use Serenity?")
+    show_options([
+        ("1", "Personal",    "free forever — personal use, research, education"),
+        ("2", "Commercial",  "$80/month  — any business or commercial deployment"),
+    ])
+    use_case = ask_num("Select", choices=["1", "2"], default="1")
+
+    if use_case == "1":
+        note(
+            "Personal use is free forever — no key, no expiry, no catch.\n"
+            "\n"
+            "What you can do:\n"
+            "  - Use Serenity for yourself, your research, your education\n"
+            "  - Modify the code and share it (non-commercially, with attribution)\n"
+            "  - Build personal tools and experiments on top of it\n"
+            "\n"
+            "What you can't do:\n"
+            "  - Sell Serenity or charge others to use it\n"
+            "  - Deploy it as a product or service for a business\n"
+            "  - Remove attribution or claim it as your own\n"
+            "\n"
+            "If you ever go commercial, grab a licence at:\n"
+            "  [cyan]https://whop.com/serenity[/cyan]",
+            "Personal Use",
+        )
+        console.print(f"[{OK}]o[/{OK}]  [white]Got it — personal use. You're good to go.[/white]\n")
+
+    else:
+        note(
+            "Commercial use requires a licence key.\n"
+            "\n"
+            "Get yours at:\n"
+            "  [cyan]https://whop.com/serenity[/cyan]\n"
+            "\n"
+            "Once you've purchased, you'll receive a key by email.\n"
+            "Enter it in the next step when prompted.\n"
+            "\n"
+            "If you haven't bought yet, open the link above now —\n"
+            "then come back and continue setup.",
+            "Commercial Use — Licence Required",
+        )
+        if not ask_confirm("I have a commercial licence key and am ready to enter it", default=False):
+            console.print(
+                f"\n[{A}]No problem — grab your key at https://whop.com/serenity[/{A}]\n"
+                f"[{MU}]Run `serenity` again once you have it.[/{MU}]\n"
+            )
+            sys.exit(0)
+
     # Security note — same pattern as OpenClaws
     note(
         "Security warning — please read.\n"
