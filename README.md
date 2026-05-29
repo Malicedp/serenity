@@ -35,7 +35,7 @@
 
 ## Getting started
 
-**No key needed to get started — Serenity runs free for 14 days out of the box.**
+**Personal use is free forever — no key, no account, no expiry.**
 
 ### Step 1 — Install Python 3.11
 
@@ -67,7 +67,7 @@ That's it. Serenity installs everything it needs, walks you through a quick setu
 
 ---
 
-> **Want a licence key after your trial?** Grab one instantly at [seraficationkey.lemonsqueezy.com](https://seraficationkey.lemonsqueezy.com/checkout/buy/9967e436-54fe-4ab3-b7f0-8ce71a348d4e) — personal use is free forever.
+> **Using Serenity commercially?** Get a licence at [whop.com/serenity](https://whop.com/serenity) — $80/month.
 
 ---
 
@@ -473,13 +473,16 @@ Both projects are worth exploring on their own.
 
 Serenity is released under **CC BY-NC 4.0** — Creative Commons Attribution-NonCommercial 4.0.
 
-**Free for:**  personal use · research · education · community projects · non-commercial redistribution
+| Tier | Price | Use case |
+|---|---|---|
+| **Personal** | Free forever | Personal use, research, education, non-commercial |
+| **Commercial** | $80 / month | Any business or commercial deployment |
 
-**Requires a licence for:** any commercial application, deployment, or integration
+**Personal use is free forever** — no key needed, no trial, no expiry.
+
+**Commercial use** requires a licence key. Get one at [whop.com/serenity](https://whop.com/serenity).
 
 Full terms in [LICENSE](LICENSE) and [TERMS.md](TERMS.md).
-
-> Keys are available at [seraficationkey.lemonsqueezy.com](https://seraficationkey.lemonsqueezy.com). Paid tiers exist purely to support the creator — Serenity is a personal project and the free tier covers everything most people will ever need.
 
 ---
 
