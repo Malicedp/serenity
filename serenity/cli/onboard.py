@@ -1745,17 +1745,10 @@ def _show_terms_acceptance() -> bool:
         "[bold]Before you continue, please read the following:[/bold]\n"
     )
     console.print(
-        "  [cyan]•[/cyan] [bold]Personal / non-commercial use[/bold] is [green]free[/green] "
-        "under CC BY-NC 4.0.\n"
-        "    Get your free key → [green]https://seraficationkey.lemonsqueezy.com/checkout/buy/9967e436-54fe-4ab3-b7f0-8ce71a348d4e[/green]\n"
-        "  [cyan]•[/cyan] [bold]Commercial use[/bold] requires a paid licence.\n"
-        "    - Solo commercial (1 user): [bold]£50 one-time[/bold]\n"
-        "      [cyan]https://seraficationkey.lemonsqueezy.com/checkout/buy/43022d03-f49d-48ad-b6fd-05a2f6fc3efd[/cyan]\n"
-        "    - Small business (≤10):     [bold]£80 / month[/bold]\n"
-        "      [yellow]https://seraficationkey.lemonsqueezy.com/checkout/buy/bde05ba3-134c-44bf-a598-7b906bbdcf90[/yellow]\n"
-        "    - Growth (≤50 people):      [bold]£200 / month[/bold]\n"
-        "      [magenta]https://seraficationkey.lemonsqueezy.com/checkout/buy/8a5c281f-b5f7-41e3-8fb8-9ee293f80dc2[/magenta]\n"
-        "    - Enterprise (50+):         [bold]Email to negotiate[/bold]  →  serenitydev32@gmail.com\n"
+        "  [cyan]•[/cyan] [bold]Personal use[/bold] is [green]free forever[/green] "
+        "under CC BY-NC 4.0. No key needed.\n"
+        "  [cyan]•[/cyan] [bold]Commercial use[/bold] requires a licence — [bold]$80 one-time[/bold].\n"
+        "    Get yours → [cyan]https://whop.com/serenity[/cyan]\n"
     )
     console.print(
         "  [cyan]•[/cyan] You may not resell, sublicence, or redistribute Serenity.\n"

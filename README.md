@@ -67,7 +67,7 @@ That's it. Serenity installs everything it needs, walks you through a quick setu
 
 ---
 
-> **Using Serenity commercially?** Get a licence at [whop.com/serenity](https://whop.com/serenity) — $80/month.
+> **Using Serenity commercially?** Get a licence at [whop.com/serenity](https://whop.com/serenity) — $80 one-time.
 
 ---
 
@@ -476,7 +476,7 @@ Serenity is released under **CC BY-NC 4.0** — Creative Commons Attribution-Non
 | Tier | Price | Use case |
 |---|---|---|
 | **Personal** | Free forever | Personal use, research, education, non-commercial |
-| **Commercial** | $80 / month | Any business or commercial deployment |
+| **Commercial** | $80 one-time | Any business or commercial deployment |
 
 **Personal use is free forever** — no key needed, no trial, no expiry.
 

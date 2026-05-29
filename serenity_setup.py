@@ -305,7 +305,7 @@ def run_wizard() -> None:
         "  Licensed under CC BY-NC 4.0. Attribution required.\n"
         "  No key needed. Just download and run.\n"
         "\n"
-        "Commercial use — $80 / month\n"
+        "Commercial use — $80 one-time\n"
         "  Any business, commercial deployment, or integration.\n"
         "  Includes a licence key for activation.\n"
         "  [cyan]https://whop.com/serenity[/cyan]\n"
@@ -334,7 +334,7 @@ def run_wizard() -> None:
     step_label("How will you use Serenity?")
     show_options([
         ("1", "Personal",    "free forever — personal use, research, education"),
-        ("2", "Commercial",  "$80/month  — any business or commercial deployment"),
+        ("2", "Commercial",  "$80 one-time — any business or commercial deployment"),
     ])
     use_case = ask_num("Select", choices=["1", "2"], default="1")
 

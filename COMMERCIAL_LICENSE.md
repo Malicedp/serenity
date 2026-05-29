@@ -20,34 +20,18 @@ licence to use Serenity solely in accordance with the tier purchased.
 
 ## 2. Licence Tiers
 
-### Personal (Non-Commercial) — Free
-- 1 user, personal use only
+### Personal (Non-Commercial) — Free forever
+- Personal use, research, and education only
 - No revenue generation permitted
 - No business or client use
 - Licensed under CC BY-NC 4.0 (see [LICENSE.md](LICENSE.md))
 
-### Solo Commercial — £50 / month
-- 1 licensed individual
-- Commercial use permitted (freelance, solo products, client work)
-- 1 production deployment
-- Email support
-
-### Small Business — £80 / month
-- Up to 10 licensed users
-- Internal business use and customer-facing products
-- Multiple deployments
-- Email support
-
-### Growth — £200 / month
-- Up to 50 licensed users
-- Internal and customer-facing commercial use
-- Unlimited deployments
-- Priority email support
-
-### Enterprise — Pricing by negotiation
-- 50+ users or large-scale deployments
-- Custom terms, SLA, and support arrangements
-- Contact Daniel directly to discuss: serenitydev32@gmail.com
+### Commercial — $80 one-time
+- Any business, freelance, client, or commercial deployment
+- Unlimited users within the purchasing organisation
+- All features included
+- Lifetime licence — pay once, use forever
+- Get yours at: https://whop.com/serenity
 
 ---
 
