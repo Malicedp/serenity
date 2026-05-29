@@ -338,6 +338,8 @@ def run_wizard() -> None:
     ])
     use_case = ask_num("Select", choices=["1", "2"], default="1")
 
+    commercial_key = ""
+
     if use_case == "1":
         note(
             "Personal use is free forever — no key, no expiry, no catch.\n"
@@ -366,18 +368,25 @@ def run_wizard() -> None:
             "  [cyan]https://whop.com/serenity[/cyan]\n"
             "\n"
             "Once you've purchased, you'll receive a key by email.\n"
-            "Enter it in the next step when prompted.\n"
-            "\n"
             "If you haven't bought yet, open the link above now —\n"
             "then come back and continue setup.",
             "Commercial Use — Licence Required",
         )
-        if not ask_confirm("I have a commercial licence key and am ready to enter it", default=False):
+        if not ask_confirm("I have my commercial licence key and am ready to enter it", default=False):
             console.print(
                 f"\n[{A}]No problem — grab your key at https://whop.com/serenity[/{A}]\n"
                 f"[{MU}]Run `serenity` again once you have it.[/{MU}]\n"
             )
             sys.exit(0)
+
+        step_label("Commercial Licence Key")
+        info_line("Paste the key you received by email after purchase.")
+        divider()
+        commercial_key = ask_secret("Licence key")
+        if not commercial_key.strip():
+            console.print(f"\n[{WN}]No key entered — setup cancelled.[/{WN}]\n")
+            sys.exit(0)
+        ok_line("Licence key saved  →  continuing to LLM setup")
 
     # Security note — same pattern as OpenClaws
     note(
@@ -930,6 +939,10 @@ def run_wizard() -> None:
             "agentName": agent_name,
             "persona":  agent_persona,
             "timezone": "",
+        },
+        "licence": {
+            "key":  commercial_key.strip(),
+            "tier": "commercial" if commercial_key.strip() else "personal",
         },
         "providers": {provider_key: provider_block},
         "agents": {
