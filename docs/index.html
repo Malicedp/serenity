@@ -410,20 +410,6 @@
       .hero-stats { gap: 1.5rem; }
     }
 
-    /* ── NEURAL CANVAS ── */
-    #neuro-canvas {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.75;
-    }
-    .hero > *:not(#neuro-canvas) {
-      position: relative;
-      z-index: 1;
-    }
-    .hero::before { display: none; }
   </style>
 </head>
 <body>
@@ -442,7 +428,6 @@
 
 <!-- HERO -->
 <div class="hero">
-  <canvas id="neuro-canvas"></canvas>
   <div class="badge">Open Source · Local · Free for 14 days</div>
   <h1>The AI agent that<br/><span>thinks like a brain</span></h1>
   <p>Serenity abstracts, generalises, and reasons across every domain — all on your own machine. No cloud. No data leaving your device. Ever.</p>
@@ -651,148 +636,6 @@
 </footer>
 
 
-<script>
-(function () {
-  const canvas = document.getElementById('neuro-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-
-  let W = 0, H = 0;
-  function resize() {
-    const hero = canvas.parentElement;
-    W = canvas.width  = hero.offsetWidth  || window.innerWidth;
-    H = canvas.height = hero.offsetHeight || window.innerHeight;
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  /* ── Palette ── */
-  const PAL = ['#ff5faa','#00e5ff','#76ff50','#ffd700','#ff7200','#a259ff','#ff3c6e','#00ffaa'];
-
-  /* ── 3-D projection (manual) ── */
-  let rotY = 0, rotX = 0;
-  function project(x, y, z) {
-    const cy = Math.cos(rotY), sy = Math.sin(rotY);
-    const x1 = x * cy - z * sy, z1 = x * sy + z * cy;
-    const cx = Math.cos(rotX), sx = Math.sin(rotX);
-    const y2 = y * cx - z1 * sx, z2 = y * sx + z1 * cx;
-    const fov = 300, s = fov / (fov + z2 + 180);
-    return { px: x1 * s + W / 2, py: y2 * s + H / 2, s };
-  }
-
-  /* ── Branch generation ── */
-  function genBranches(ox, oy, oz, dx, dy, dz, len, depth, maxD, out) {
-    if (depth > maxD || len < 0.5) return;
-    const ex = ox + dx * len, ey = oy + dy * len, ez = oz + dz * len;
-    out.push({ sx: ox, sy: oy, sz: oz, ex, ey, ez });
-    if (depth < maxD) {
-      const kids = depth === 0 ? 3 + (Math.random() * 3 | 0) : 2 + (Math.random() * 2 | 0);
-      for (let i = 0; i < kids; i++) {
-        const spread = 0.38 + Math.random() * 0.52;
-        let px = Math.random()-0.5, py = Math.random()-0.5, pz = Math.random()-0.5;
-        const dot = dx*px + dy*py + dz*pz;
-        px -= dot*dx; py -= dot*dy; pz -= dot*dz;
-        const pl = Math.sqrt(px*px+py*py+pz*pz)||1;
-        let cdx = dx + (px/pl)*spread, cdy = dy + (py/pl)*spread, cdz = dz + (pz/pl)*spread;
-        const cl = Math.sqrt(cdx*cdx+cdy*cdy+cdz*cdz)||1;
-        genBranches(ex, ey, ez, cdx/cl, cdy/cl, cdz/cl, len*(0.52+Math.random()*0.22), depth+1, maxD, out);
-      }
-    }
-  }
-
-  /* ── Build neurons ── */
-  const neurons = [];
-  for (let i = 0; i < 15; i++) {
-    const angle = (i / 15) * Math.PI * 2;
-    const r  = 14 + Math.random() * 30;
-    const cx = Math.cos(angle) * r + (Math.random()-.5) * 16;
-    const cy = (Math.random()-.5) * 52;
-    const cz = Math.sin(angle) * r * 0.6 + (Math.random()-.5) * 16;
-    const color = PAL[i % PAL.length];
-    const scale = 0.65 + Math.random() * 0.65;
-    const branches = [];
-    for (let a = 0; a < 4 + (Math.random()*4|0); a++) {
-      let dx=Math.random()-.5, dy=Math.random()-.5, dz=Math.random()-.5;
-      const dl=Math.sqrt(dx*dx+dy*dy+dz*dz)||1;
-      genBranches(cx,cy,cz, dx/dl,dy/dl,dz/dl, scale*(7+Math.random()*7), 0, 3, branches);
-    }
-    neurons.push({ cx, cy, cz, color, branches, phase: Math.random()*Math.PI*2 });
-  }
-
-  /* ── Signals ── */
-  const signals = [];
-  function spawnSignal() {
-    if (signals.length >= 45) return;
-    const n = neurons[Math.random()*neurons.length|0];
-    if (!n.branches.length) return;
-    const b = n.branches[Math.random()*n.branches.length|0];
-    signals.push({ n, b, t: 0, speed: 0.007 + Math.random()*0.014 });
-  }
-  for (let i = 0; i < 32; i++) spawnSignal();
-
-  /* ── Draw helpers ── */
-  function line3D(sx, sy, sz, ex, ey, ez, color, alpha) {
-    const a = project(sx,sy,sz), b = project(ex,ey,ez);
-    const bright = (a.s + b.s) * 0.5;
-    ctx.globalAlpha = alpha * bright;
-    ctx.strokeStyle = color;
-    ctx.shadowColor  = color;
-    ctx.shadowBlur   = 7;
-    ctx.lineWidth    = 2.5 * bright;
-    ctx.beginPath(); ctx.moveTo(a.px,a.py); ctx.lineTo(b.px,b.py); ctx.stroke();
-    ctx.lineWidth    = 0.7 * bright;
-    ctx.globalAlpha  = Math.min(1, alpha * bright * 1.6);
-    ctx.beginPath(); ctx.moveTo(a.px,a.py); ctx.lineTo(b.px,b.py); ctx.stroke();
-    ctx.shadowBlur = 0; ctx.globalAlpha = 1;
-  }
-
-  function dot3D(x, y, z, r, color, alpha, glow) {
-    const p = project(x,y,z);
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle   = color;
-    ctx.shadowColor = color;
-    ctx.shadowBlur  = glow;
-    ctx.beginPath(); ctx.arc(p.px, p.py, r * p.s, 0, Math.PI*2); ctx.fill();
-    ctx.shadowBlur = 0; ctx.globalAlpha = 1;
-  }
-
-  /* ── Render loop ── */
-  let t = 0;
-  function draw() {
-    requestAnimationFrame(draw);
-    t += 0.004;
-    rotY = t * 0.24;
-    rotX = Math.sin(t * 0.16) * 0.22;
-
-    ctx.clearRect(0, 0, W, H);
-
-    /* branches */
-    neurons.forEach(n => {
-      n.branches.forEach(b => line3D(b.sx,b.sy,b.sz, b.ex,b.ey,b.ez, n.color, 0.42));
-    });
-
-    /* soma */
-    neurons.forEach(n => {
-      n.phase += 0.025;
-      dot3D(n.cx,n.cy,n.cz, 5, n.color, 0.07+Math.abs(Math.sin(n.phase))*0.1, 20);
-      dot3D(n.cx,n.cy,n.cz, 1.1, n.color, 0.95, 14);
-    });
-
-    /* signals */
-    for (let i = signals.length-1; i >= 0; i--) {
-      const s = signals[i];
-      s.t += s.speed;
-      if (s.t >= 1) { signals.splice(i,1); spawnSignal(); continue; }
-      const x = s.b.sx + (s.b.ex-s.b.sx)*s.t;
-      const y = s.b.sy + (s.b.ey-s.b.sy)*s.t;
-      const z = s.b.sz + (s.b.ez-s.b.sz)*s.t;
-      dot3D(x, y, z, 1.3, s.n.color, 1, 12);
-    }
-    while (signals.length < 30) spawnSignal();
-  }
-  draw();
-})();
-</script>
 
 </body>
 </html>
